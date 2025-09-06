@@ -2,50 +2,65 @@ import React from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import AdminLayout from '../layouts/adminlayout';
 import Dashboard from '../pages/admin/dashboard';
-import Fees from '../pages/admin/fees'; // Import the new Fees component
+import Students from '../pages/admin/student';
+import Fees from '../pages/admin/fees';
 
 // Simple test components for now
-function AdminStudents(): JSX.Element {
-  return <div>Students Content Coming Soon...</div>;
-}
-
-function AdminMess(): JSX.Element {
+const AdminMess: React.FC = (): JSX.Element => {
   return <div>Mess Content Coming Soon...</div>;
-}
+};
 
-function AdminComplaints(): JSX.Element {
+const AdminComplaints: React.FC = (): JSX.Element => {
   return <div>Complaints Content Coming Soon...</div>;
-}
+};
 
-const AppRoutes = () => {
+const AppRoutes: React.FC = () => {
   return (
     <Routes>
-      <Route path="/admin/dashboard" element={
-        <AdminLayout pageTitle="Dashboard">
-          <Dashboard />
-        </AdminLayout>
-      } />
-      <Route path="/admin/students" element={
-        <AdminLayout pageTitle="Students Management">
-          <AdminStudents />
-        </AdminLayout>
-      } />
-      <Route path="/admin/fees" element={
-        <AdminLayout pageTitle="Fees Management">
-          <Fees />
-        </AdminLayout>
-      } />
-      <Route path="/admin/mess" element={
-        <AdminLayout pageTitle="Mess Management">
-          <AdminMess />
-        </AdminLayout>
-      } />
-      <Route path="/admin/complaints" element={
-        <AdminLayout pageTitle="Complaints">
-          <AdminComplaints />
-        </AdminLayout>
-      } />
-      <Route path="/" element={<Navigate to="/admin/dashboard" replace />} />
+      <Route 
+        path="/admin/dashboard" 
+        element={
+          <AdminLayout pageTitle="Dashboard">
+            <Dashboard />
+          </AdminLayout>
+        } 
+      />
+      <Route 
+        path="/admin/students" 
+        element={
+          <AdminLayout pageTitle="Students Management">
+            <Students />
+          </AdminLayout>
+        } 
+      />
+      <Route 
+        path="/admin/fees" 
+        element={
+          <AdminLayout pageTitle="Fees Management">
+            <Fees />
+          </AdminLayout>
+        } 
+      />
+      <Route 
+        path="/admin/mess" 
+        element={
+          <AdminLayout pageTitle="Mess Management">
+            <AdminMess />
+          </AdminLayout>
+        } 
+      />
+      <Route 
+        path="/admin/complaints" 
+        element={
+          <AdminLayout pageTitle="Complaints">
+            <AdminComplaints />
+          </AdminLayout>
+        } 
+      />
+      <Route 
+        path="/" 
+        element={<Navigate to="/admin/dashboard" replace />} 
+      />
     </Routes>
   );
 };
