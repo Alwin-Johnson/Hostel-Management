@@ -34,5 +34,8 @@ const StatsCard: React.FC<StatsCardProps> = ({
   );
 };
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> fb56941 (njefnj)
 export default StatsCard;
