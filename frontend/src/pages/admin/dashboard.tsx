@@ -1,3 +1,4 @@
+// src/pages/admin/dashboard.tsx
 import React from 'react';
 import StatsCard from '../../components/admin/statscard';
 import LineChartCard from '../../components/admin/linechartcard';

@@ -1,9 +1,10 @@
+// src/routes/appRoutes.tsx
 import React from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import AdminLayout from '../layouts/adminlayout';
 import Dashboard from '../pages/admin/dashboard';
 import Fees from '../pages/admin/fees';
-import MessManagement from '../pages/admin/mess'; // Add this import
+import Mess from '../pages/admin/mess';
 
 // Simple test components for now
 function AdminStudents(): JSX.Element {
@@ -33,7 +34,9 @@ const AppRoutes = () => {
         </AdminLayout>
       } />
       <Route path="/admin/mess" element={
-        <MessManagement />
+        <AdminLayout pageTitle="Mess Management">
+          <Mess />
+        </AdminLayout>
       } />
       <Route path="/admin/complaints" element={
         <AdminLayout pageTitle="Complaints">

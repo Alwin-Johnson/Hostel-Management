@@ -1,3 +1,4 @@
+// src/pages/admin/fees.tsx
 import React, { useState } from 'react';
 import { Users, TrendingUp, AlertTriangle, CheckCircle } from 'lucide-react';
 
