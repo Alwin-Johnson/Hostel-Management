@@ -1,15 +1,13 @@
+// src/routes/appRoutes.tsx
 import React from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import AdminLayout from '../layouts/adminlayout';
 import Dashboard from '../pages/admin/dashboard';
 import Students from '../pages/admin/student';
 import Fees from '../pages/admin/fees';
+import Mess from '../pages/admin/mess';
 
 // Simple test components for now
-const AdminMess: React.FC = (): JSX.Element => {
-  return <div>Mess Content Coming Soon...</div>;
-};
-
 const AdminComplaints: React.FC = (): JSX.Element => {
   return <div>Complaints Content Coming Soon...</div>;
 };
@@ -45,7 +43,7 @@ const AppRoutes: React.FC = () => {
         path="/admin/mess" 
         element={
           <AdminLayout pageTitle="Mess Management">
-            <AdminMess />
+            <Mess />
           </AdminLayout>
         } 
       />
