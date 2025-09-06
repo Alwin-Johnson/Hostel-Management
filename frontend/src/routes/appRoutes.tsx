@@ -2,14 +2,11 @@ import React from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import AdminLayout from '../layouts/adminlayout';
 import Dashboard from '../pages/admin/dashboard';
+import Fees from '../pages/admin/fees'; // Import the new Fees component
 
 // Simple test components for now
 function AdminStudents(): JSX.Element {
   return <div>Students Content Coming Soon...</div>;
-}
-
-function AdminFees(): JSX.Element {
-  return <div>Fees Content Coming Soon...</div>;
 }
 
 function AdminMess(): JSX.Element {
@@ -35,7 +32,7 @@ const AppRoutes = () => {
       } />
       <Route path="/admin/fees" element={
         <AdminLayout pageTitle="Fees Management">
-          <AdminFees />
+          <Fees />
         </AdminLayout>
       } />
       <Route path="/admin/mess" element={
