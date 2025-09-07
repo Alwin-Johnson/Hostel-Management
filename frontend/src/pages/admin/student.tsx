@@ -23,7 +23,7 @@ interface Student {
   block: string;
   admissionDate: string;
   feeStatus: 'paid' | 'pending' | 'overdue';
-  payStatus: 'current' | 'pending' | 'overdue';
+  dueAmount: number;
   email?: string;
   phone?: string;
 }
@@ -48,7 +48,7 @@ const initialStudentsData: Student[] = [
     block: 'ADMIN BLOCK',
     admissionDate: '2023-01-15',
     feeStatus: 'paid',
-    payStatus: 'current',
+    dueAmount: 0,
     email: 'arun.kumar@email.com',
     phone: '+91 9876543210'
   },
@@ -60,8 +60,8 @@ const initialStudentsData: Student[] = [
     roomNo: 'B205',
     block: 'SOUTH BLOCK',
     admissionDate: '2023-02-20',
-    feeStatus: 'pending',
-    payStatus: 'overdue',
+    feeStatus: 'overdue',
+    dueAmount: 15000,
     email: 'priya.sharma@email.com',
     phone: '+91 9876543211'
   },
@@ -74,7 +74,7 @@ const initialStudentsData: Student[] = [
     block: 'NORTH BLOCK',
     admissionDate: '2023-01-10',
     feeStatus: 'paid',
-    payStatus: 'current',
+    dueAmount: 0,
     email: 'raj.patel@email.com',
     phone: '+91 9876543212'
   },
@@ -87,7 +87,7 @@ const initialStudentsData: Student[] = [
     block: 'ADMIN BLOCK', 
     admissionDate: '2023-03-05',
     feeStatus: 'pending',
-    payStatus: 'pending',
+    dueAmount: 8500,
     email: 'sneha.reddy@email.com',
     phone: '+91 9876543213'
   },
@@ -100,7 +100,7 @@ const initialStudentsData: Student[] = [
     block: 'SOUTH BLOCK',
     admissionDate: '2023-01-25',
     feeStatus: 'paid',
-    payStatus: 'current',
+    dueAmount: 0,
     email: 'vikram.singh@email.com',
     phone: '+91 9876543214'
   },
@@ -113,7 +113,7 @@ const initialStudentsData: Student[] = [
     block: 'NORTH BLOCK',
     admissionDate: '2023-02-15',
     feeStatus: 'overdue',
-    payStatus: 'overdue',
+    dueAmount: 22000,
     email: 'anita.joshi@email.com',
     phone: '+91 9876543215'
   }
@@ -366,7 +366,7 @@ const AddStudentModal: React.FC<{
   );
 };
 
-const StatusBadge: React.FC<{ status: string; type: 'fee' | 'pay' }> = ({ status, type }) => {
+const StatusBadge: React.FC<{ status: string; type?: 'fee' | 'pay' }> = ({ status, type = 'fee' }) => {
   const getStatusClasses = () => {
     const baseClasses = "px-2 py-1 rounded-full text-xs font-medium";
     
@@ -383,71 +383,20 @@ const StatusBadge: React.FC<{ status: string; type: 'fee' | 'pay' }> = ({ status
     }
   };
 
-  const getStatusText = () => {
-    if (type === 'fee') {
-      return status.charAt(0).toUpperCase() + status.slice(1);
-    }
-    return status === 'current' ? 'Current' : status.charAt(0).toUpperCase() + status.slice(1);
-  };
-
   return (
     <span className={getStatusClasses()}>
-      {getStatusText()}
+      {status.charAt(0).toUpperCase() + status.slice(1)}
     </span>
   );
 };
 
-const ActionDropdown: React.FC<{ student: Student; onAction: (action: string, student: Student) => void }> = ({ 
-  student, 
-  onAction 
-}) => {
-  const [isOpen, setIsOpen] = useState(false);
-
-  const actions = [
-    { icon: Eye, label: 'View Details', action: 'view' },
-    { icon: Edit, label: 'Edit Student', action: 'edit' },
-    { icon: Trash2, label: 'Delete Student', action: 'delete', danger: true }
-  ];
-
-  return (
-    <div className="relative">
-      <button
-        onClick={() => setIsOpen(!isOpen)}
-        className="p-1 rounded-lg hover:bg-gray-100 transition-colors"
-      >
-        <MoreHorizontal className="w-4 h-4 text-gray-500" />
-      </button>
-
-      {isOpen && (
-        <>
-          <div 
-            className="fixed inset-0 z-10" 
-            onClick={() => setIsOpen(false)}
-          />
-          <div className="absolute right-0 mt-1 w-40 bg-white border border-gray-200 rounded-lg shadow-lg z-20">
-            {actions.map((action) => {
-              const Icon = action.icon;
-              return (
-                <button
-                  key={action.action}
-                  onClick={() => {
-                    onAction(action.action, student);
-                    setIsOpen(false);
-                  }}
-                  className={`w-full flex items-center space-x-2 px-3 py-2 text-sm hover:bg-gray-50 transition-colors ${
-                    action.danger ? 'text-red-600' : 'text-gray-700'
-                  } first:rounded-t-lg last:rounded-b-lg`}
-                >
-                  <Icon className="w-4 h-4" />
-                  <span>{action.label}</span>
-                </button>
-              );
-            })}
-          </div>
-        </>
-      )}
-    </div>
-  );
+const formatCurrency = (amount: number): string => {
+  return new Intl.NumberFormat('en-IN', {
+    style: 'currency',
+    currency: 'INR',
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
+  }).format(amount);
 };
 
 const Students: React.FC = () => {
@@ -501,7 +450,7 @@ const Students: React.FC = () => {
       block: newStudentData.block,
       admissionDate: newStudentData.admissionDate,
       feeStatus: 'pending',
-      payStatus: 'pending',
+      dueAmount: 10000, // Default due amount for new students
       email: newStudentData.email,
       phone: newStudentData.phone
     };
@@ -539,7 +488,6 @@ const Students: React.FC = () => {
         const aValue = a[sortConfig.column as keyof Student];
         const bValue = b[sortConfig.column as keyof Student];
         
-        // Handle undefined values
         if (aValue === undefined && bValue === undefined) return 0;
         if (aValue === undefined) return sortConfig.direction === 'asc' ? 1 : -1;
         if (bValue === undefined) return sortConfig.direction === 'asc' ? -1 : 1;
@@ -633,19 +581,16 @@ const Students: React.FC = () => {
     {
       key: 'feeStatus',
       header: 'Fee Status',
-      render: (value) => <StatusBadge status={value} type="fee" />
+      render: (value) => <StatusBadge status={value} />
     },
     {
-      key: 'payStatus',
-      header: 'Pay Status',
-      render: (value) => <StatusBadge status={value} type="pay" />
-    },
-    {
-      key: 'actions',
-      header: 'Actions',
-      align: 'center',
-      render: (_, student) => (
-        <ActionDropdown student={student} onAction={handleAction} />
+      key: 'dueAmount',
+      header: 'Due Amount',
+      sortable: true,
+      render: (value) => (
+        <span className={`font-medium ${value > 0 ? 'text-red-600' : 'text-green-600'}`}>
+          {formatCurrency(value)}
+        </span>
       )
     }
   ];
