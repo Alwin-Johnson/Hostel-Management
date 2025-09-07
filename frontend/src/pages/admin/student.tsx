@@ -2,11 +2,6 @@ import React, { useState, useMemo } from 'react';
 import { 
   Search, 
   Plus, 
-  Filter, 
-  MoreHorizontal,
-  Eye,
-  Edit,
-  Trash2,
   ChevronDown,
   X,
   Check,
@@ -23,7 +18,7 @@ interface Student {
   block: string;
   admissionDate: string;
   feeStatus: 'paid' | 'pending' | 'overdue';
-  payStatus: 'current' | 'pending' | 'overdue';
+  dueAmount: number;
   email?: string;
   phone?: string;
 }
@@ -48,7 +43,7 @@ const initialStudentsData: Student[] = [
     block: 'ADMIN BLOCK',
     admissionDate: '2023-01-15',
     feeStatus: 'paid',
-    payStatus: 'current',
+    dueAmount: 0,
     email: 'arun.kumar@email.com',
     phone: '+91 9876543210'
   },
@@ -60,8 +55,8 @@ const initialStudentsData: Student[] = [
     roomNo: 'B205',
     block: 'SOUTH BLOCK',
     admissionDate: '2023-02-20',
-    feeStatus: 'pending',
-    payStatus: 'overdue',
+    feeStatus: 'overdue',
+    dueAmount: 15000,
     email: 'priya.sharma@email.com',
     phone: '+91 9876543211'
   },
@@ -74,7 +69,7 @@ const initialStudentsData: Student[] = [
     block: 'NORTH BLOCK',
     admissionDate: '2023-01-10',
     feeStatus: 'paid',
-    payStatus: 'current',
+    dueAmount: 0,
     email: 'raj.patel@email.com',
     phone: '+91 9876543212'
   },
@@ -87,7 +82,7 @@ const initialStudentsData: Student[] = [
     block: 'ADMIN BLOCK', 
     admissionDate: '2023-03-05',
     feeStatus: 'pending',
-    payStatus: 'pending',
+    dueAmount: 8500,
     email: 'sneha.reddy@email.com',
     phone: '+91 9876543213'
   },
@@ -100,7 +95,7 @@ const initialStudentsData: Student[] = [
     block: 'SOUTH BLOCK',
     admissionDate: '2023-01-25',
     feeStatus: 'paid',
-    payStatus: 'current',
+    dueAmount: 0,
     email: 'vikram.singh@email.com',
     phone: '+91 9876543214'
   },
@@ -113,7 +108,7 @@ const initialStudentsData: Student[] = [
     block: 'NORTH BLOCK',
     admissionDate: '2023-02-15',
     feeStatus: 'overdue',
-    payStatus: 'overdue',
+    dueAmount: 22000,
     email: 'anita.joshi@email.com',
     phone: '+91 9876543215'
   }
@@ -125,32 +120,21 @@ const Notification: React.FC<{
   message: string;
   onClose: () => void;
 }> = ({ type, message, onClose }) => {
-  const getNotificationClasses = () => {
-    const baseClasses = "fixed top-4 right-4 z-50 p-4 rounded-lg shadow-lg flex items-center space-x-3 min-w-80";
-    switch (type) {
-      case 'success':
-        return `${baseClasses} bg-green-50 border border-green-200 text-green-800`;
-      case 'error':
-        return `${baseClasses} bg-red-50 border border-red-200 text-red-800`;
-      case 'info':
-        return `${baseClasses} bg-blue-50 border border-blue-200 text-blue-800`;
-    }
+  const notificationStyles = {
+    success: "bg-green-50 border-green-200 text-green-800",
+    error: "bg-red-50 border-red-200 text-red-800",
+    info: "bg-blue-50 border-blue-200 text-blue-800"
   };
 
-  const getIcon = () => {
-    switch (type) {
-      case 'success':
-        return <Check className="w-5 h-5 text-green-600" />;
-      case 'error':
-        return <AlertCircle className="w-5 h-5 text-red-600" />;
-      case 'info':
-        return <AlertCircle className="w-5 h-5 text-blue-600" />;
-    }
+  const icons = {
+    success: <Check className="w-5 h-5 text-green-600" />,
+    error: <AlertCircle className="w-5 h-5 text-red-600" />,
+    info: <AlertCircle className="w-5 h-5 text-blue-600" />
   };
 
   return (
-    <div className={getNotificationClasses()}>
-      {getIcon()}
+    <div className={`fixed top-4 right-4 z-50 p-4 rounded-lg shadow-lg flex items-center space-x-3 min-w-80 border ${notificationStyles[type]}`}>
+      {icons[type]}
       <span className="flex-1">{message}</span>
       <button
         onClick={onClose}
@@ -186,8 +170,11 @@ const AddStudentModal: React.FC<{
     const newErrors: Partial<NewStudentData> = {};
 
     if (!formData.name.trim()) newErrors.name = 'Name is required';
-    if (!formData.email.trim()) newErrors.email = 'Email is required';
-    else if (!/\S+@\S+\.\S+/.test(formData.email)) newErrors.email = 'Email is invalid';
+    if (!formData.email.trim()) {
+      newErrors.email = 'Email is required';
+    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
+      newErrors.email = 'Email is invalid';
+    }
     if (!formData.phone.trim()) newErrors.phone = 'Phone is required';
     if (!formData.roomNo.trim()) newErrors.roomNo = 'Room number is required';
     if (!formData.block) newErrors.block = 'Block is required';
@@ -366,88 +353,27 @@ const AddStudentModal: React.FC<{
   );
 };
 
-const StatusBadge: React.FC<{ status: string; type: 'fee' | 'pay' }> = ({ status, type }) => {
-  const getStatusClasses = () => {
-    const baseClasses = "px-2 py-1 rounded-full text-xs font-medium";
-    
-    switch (status) {
-      case 'paid':
-      case 'current':
-        return `${baseClasses} bg-green-100 text-green-700`;
-      case 'pending':
-        return `${baseClasses} bg-yellow-100 text-yellow-700`;
-      case 'overdue':
-        return `${baseClasses} bg-red-100 text-red-700`;
-      default:
-        return `${baseClasses} bg-gray-100 text-gray-700`;
-    }
-  };
-
-  const getStatusText = () => {
-    if (type === 'fee') {
-      return status.charAt(0).toUpperCase() + status.slice(1);
-    }
-    return status === 'current' ? 'Current' : status.charAt(0).toUpperCase() + status.slice(1);
+const StatusBadge: React.FC<{ status: string }> = ({ status }) => {
+  const statusStyles = {
+    paid: "bg-green-100 text-green-700",
+    pending: "bg-yellow-100 text-yellow-700",
+    overdue: "bg-red-100 text-red-700"
   };
 
   return (
-    <span className={getStatusClasses()}>
-      {getStatusText()}
+    <span className={`px-2 py-1 rounded-full text-xs font-medium ${statusStyles[status as keyof typeof statusStyles] || 'bg-gray-100 text-gray-700'}`}>
+      {status.charAt(0).toUpperCase() + status.slice(1)}
     </span>
   );
 };
 
-const ActionDropdown: React.FC<{ student: Student; onAction: (action: string, student: Student) => void }> = ({ 
-  student, 
-  onAction 
-}) => {
-  const [isOpen, setIsOpen] = useState(false);
-
-  const actions = [
-    { icon: Eye, label: 'View Details', action: 'view' },
-    { icon: Edit, label: 'Edit Student', action: 'edit' },
-    { icon: Trash2, label: 'Delete Student', action: 'delete', danger: true }
-  ];
-
-  return (
-    <div className="relative">
-      <button
-        onClick={() => setIsOpen(!isOpen)}
-        className="p-1 rounded-lg hover:bg-gray-100 transition-colors"
-      >
-        <MoreHorizontal className="w-4 h-4 text-gray-500" />
-      </button>
-
-      {isOpen && (
-        <>
-          <div 
-            className="fixed inset-0 z-10" 
-            onClick={() => setIsOpen(false)}
-          />
-          <div className="absolute right-0 mt-1 w-40 bg-white border border-gray-200 rounded-lg shadow-lg z-20">
-            {actions.map((action) => {
-              const Icon = action.icon;
-              return (
-                <button
-                  key={action.action}
-                  onClick={() => {
-                    onAction(action.action, student);
-                    setIsOpen(false);
-                  }}
-                  className={`w-full flex items-center space-x-2 px-3 py-2 text-sm hover:bg-gray-50 transition-colors ${
-                    action.danger ? 'text-red-600' : 'text-gray-700'
-                  } first:rounded-t-lg last:rounded-b-lg`}
-                >
-                  <Icon className="w-4 h-4" />
-                  <span>{action.label}</span>
-                </button>
-              );
-            })}
-          </div>
-        </>
-      )}
-    </div>
-  );
+const formatCurrency = (amount: number): string => {
+  return new Intl.NumberFormat('en-IN', {
+    style: 'currency',
+    currency: 'INR',
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
+  }).format(amount);
 };
 
 const Students: React.FC = () => {
@@ -485,9 +411,7 @@ const Students: React.FC = () => {
   // Show notification
   const showNotification = (type: 'success' | 'error' | 'info', message: string) => {
     setNotification({ type, message });
-    setTimeout(() => {
-      setNotification(null);
-    }, 5000);
+    setTimeout(() => setNotification(null), 5000);
   };
 
   // Handle add student
@@ -501,7 +425,7 @@ const Students: React.FC = () => {
       block: newStudentData.block,
       admissionDate: newStudentData.admissionDate,
       feeStatus: 'pending',
-      payStatus: 'pending',
+      dueAmount: 10000, // Default due amount for new students
       email: newStudentData.email,
       phone: newStudentData.phone
     };
@@ -539,7 +463,6 @@ const Students: React.FC = () => {
         const aValue = a[sortConfig.column as keyof Student];
         const bValue = b[sortConfig.column as keyof Student];
         
-        // Handle undefined values
         if (aValue === undefined && bValue === undefined) return 0;
         if (aValue === undefined) return sortConfig.direction === 'asc' ? 1 : -1;
         if (bValue === undefined) return sortConfig.direction === 'asc' ? -1 : 1;
@@ -556,23 +479,6 @@ const Students: React.FC = () => {
 
     return filtered;
   }, [searchTerm, selectedBlock, selectedStatus, sortConfig, studentsData]);
-
-  const handleAction = (action: string, student: Student) => {
-    switch (action) {
-      case 'view':
-        console.log('View student:', student);
-        showNotification('info', `Viewing details for ${student.name}`);
-        break;
-      case 'edit':
-        console.log('Edit student:', student);
-        showNotification('info', `Edit functionality for ${student.name} coming soon`);
-        break;
-      case 'delete':
-        console.log('Delete student:', student);
-        showNotification('info', `Delete functionality for ${student.name} coming soon`);
-        break;
-    }
-  };
 
   const handleSort = (column: string, direction: 'asc' | 'desc') => {
     setSortConfig({ column, direction });
@@ -633,25 +539,22 @@ const Students: React.FC = () => {
     {
       key: 'feeStatus',
       header: 'Fee Status',
-      render: (value) => <StatusBadge status={value} type="fee" />
+      render: (value) => <StatusBadge status={value} />
     },
     {
-      key: 'payStatus',
-      header: 'Pay Status',
-      render: (value) => <StatusBadge status={value} type="pay" />
-    },
-    {
-      key: 'actions',
-      header: 'Actions',
-      align: 'center',
-      render: (_, student) => (
-        <ActionDropdown student={student} onAction={handleAction} />
+      key: 'dueAmount',
+      header: 'Due Amount',
+      sortable: true,
+      render: (value) => (
+        <span className={`font-medium ${value > 0 ? 'text-red-600' : 'text-green-600'}`}>
+          {formatCurrency(value)}
+        </span>
       )
     }
   ];
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       {/* Notification */}
       {notification && (
         <Notification
@@ -669,12 +572,7 @@ const Students: React.FC = () => {
       />
 
       {/* Header Section */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h2 className="text-2xl font-bold text-gray-900">Students Management</h2>
-          <p className="text-gray-600">Manage student records and information</p>
-        </div>
-        
+      <div className="flex justify-end">
         <button 
           onClick={() => setIsAddModalOpen(true)}
           className="flex items-center space-x-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
