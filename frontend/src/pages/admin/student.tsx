@@ -2,6 +2,11 @@ import React, { useState, useMemo } from 'react';
 import { 
   Search, 
   Plus, 
+  Filter, 
+  MoreHorizontal,
+  Eye,
+  Edit,
+  Trash2,
   ChevronDown,
   X,
   Check,
@@ -120,21 +125,32 @@ const Notification: React.FC<{
   message: string;
   onClose: () => void;
 }> = ({ type, message, onClose }) => {
-  const notificationStyles = {
-    success: "bg-green-50 border-green-200 text-green-800",
-    error: "bg-red-50 border-red-200 text-red-800",
-    info: "bg-blue-50 border-blue-200 text-blue-800"
+  const getNotificationClasses = () => {
+    const baseClasses = "fixed top-4 right-4 z-50 p-4 rounded-lg shadow-lg flex items-center space-x-3 min-w-80";
+    switch (type) {
+      case 'success':
+        return `${baseClasses} bg-green-50 border border-green-200 text-green-800`;
+      case 'error':
+        return `${baseClasses} bg-red-50 border border-red-200 text-red-800`;
+      case 'info':
+        return `${baseClasses} bg-blue-50 border border-blue-200 text-blue-800`;
+    }
   };
 
-  const icons = {
-    success: <Check className="w-5 h-5 text-green-600" />,
-    error: <AlertCircle className="w-5 h-5 text-red-600" />,
-    info: <AlertCircle className="w-5 h-5 text-blue-600" />
+  const getIcon = () => {
+    switch (type) {
+      case 'success':
+        return <Check className="w-5 h-5 text-green-600" />;
+      case 'error':
+        return <AlertCircle className="w-5 h-5 text-red-600" />;
+      case 'info':
+        return <AlertCircle className="w-5 h-5 text-blue-600" />;
+    }
   };
 
   return (
-    <div className={`fixed top-4 right-4 z-50 p-4 rounded-lg shadow-lg flex items-center space-x-3 min-w-80 border ${notificationStyles[type]}`}>
-      {icons[type]}
+    <div className={getNotificationClasses()}>
+      {getIcon()}
       <span className="flex-1">{message}</span>
       <button
         onClick={onClose}
@@ -170,11 +186,8 @@ const AddStudentModal: React.FC<{
     const newErrors: Partial<NewStudentData> = {};
 
     if (!formData.name.trim()) newErrors.name = 'Name is required';
-    if (!formData.email.trim()) {
-      newErrors.email = 'Email is required';
-    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-      newErrors.email = 'Email is invalid';
-    }
+    if (!formData.email.trim()) newErrors.email = 'Email is required';
+    else if (!/\S+@\S+\.\S+/.test(formData.email)) newErrors.email = 'Email is invalid';
     if (!formData.phone.trim()) newErrors.phone = 'Phone is required';
     if (!formData.roomNo.trim()) newErrors.roomNo = 'Room number is required';
     if (!formData.block) newErrors.block = 'Block is required';
@@ -353,15 +366,25 @@ const AddStudentModal: React.FC<{
   );
 };
 
-const StatusBadge: React.FC<{ status: string }> = ({ status }) => {
-  const statusStyles = {
-    paid: "bg-green-100 text-green-700",
-    pending: "bg-yellow-100 text-yellow-700",
-    overdue: "bg-red-100 text-red-700"
+const StatusBadge: React.FC<{ status: string; type?: 'fee' | 'pay' }> = ({ status, type = 'fee' }) => {
+  const getStatusClasses = () => {
+    const baseClasses = "px-2 py-1 rounded-full text-xs font-medium";
+    
+    switch (status) {
+      case 'paid':
+      case 'current':
+        return `${baseClasses} bg-green-100 text-green-700`;
+      case 'pending':
+        return `${baseClasses} bg-yellow-100 text-yellow-700`;
+      case 'overdue':
+        return `${baseClasses} bg-red-100 text-red-700`;
+      default:
+        return `${baseClasses} bg-gray-100 text-gray-700`;
+    }
   };
 
   return (
-    <span className={`px-2 py-1 rounded-full text-xs font-medium ${statusStyles[status as keyof typeof statusStyles] || 'bg-gray-100 text-gray-700'}`}>
+    <span className={getStatusClasses()}>
       {status.charAt(0).toUpperCase() + status.slice(1)}
     </span>
   );
@@ -411,7 +434,9 @@ const Students: React.FC = () => {
   // Show notification
   const showNotification = (type: 'success' | 'error' | 'info', message: string) => {
     setNotification({ type, message });
-    setTimeout(() => setNotification(null), 5000);
+    setTimeout(() => {
+      setNotification(null);
+    }, 5000);
   };
 
   // Handle add student
@@ -479,6 +504,23 @@ const Students: React.FC = () => {
 
     return filtered;
   }, [searchTerm, selectedBlock, selectedStatus, sortConfig, studentsData]);
+
+  const handleAction = (action: string, student: Student) => {
+    switch (action) {
+      case 'view':
+        console.log('View student:', student);
+        showNotification('info', `Viewing details for ${student.name}`);
+        break;
+      case 'edit':
+        console.log('Edit student:', student);
+        showNotification('info', `Edit functionality for ${student.name} coming soon`);
+        break;
+      case 'delete':
+        console.log('Delete student:', student);
+        showNotification('info', `Delete functionality for ${student.name} coming soon`);
+        break;
+    }
+  };
 
   const handleSort = (column: string, direction: 'asc' | 'desc') => {
     setSortConfig({ column, direction });
@@ -554,7 +596,7 @@ const Students: React.FC = () => {
   ];
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-6">
       {/* Notification */}
       {notification && (
         <Notification
@@ -572,7 +614,12 @@ const Students: React.FC = () => {
       />
 
       {/* Header Section */}
-      <div className="flex justify-end">
+      <div className="flex items-center justify-between">
+        <div>
+          <h2 className="text-2xl font-bold text-gray-900">Students Management</h2>
+          <p className="text-gray-600">Manage student records and information</p>
+        </div>
+        
         <button 
           onClick={() => setIsAddModalOpen(true)}
           className="flex items-center space-x-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
