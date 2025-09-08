@@ -613,23 +613,7 @@ const Students: React.FC = () => {
         onSubmit={handleAddStudent}
       />
 
-      {/* Header Section */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h2 className="text-2xl font-bold text-gray-900">Students Management</h2>
-          <p className="text-gray-600">Manage student records and information</p>
-        </div>
-        
-        <button 
-          onClick={() => setIsAddModalOpen(true)}
-          className="flex items-center space-x-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
-        >
-          <Plus className="w-4 h-4" />
-          <span>Add new student</span>
-        </button>
-      </div>
-
-      {/* Filters and Search */}
+      {/* Header Section with Filters and Add Button */}
       <div className="flex items-center justify-between space-x-4">
         <div className="flex items-center space-x-4 flex-1">
           {/* Search */}
@@ -651,7 +635,7 @@ const Students: React.FC = () => {
               onChange={(e) => setSelectedBlock(e.target.value)}
               className="appearance-none bg-white border border-gray-300 rounded-lg px-3 py-2 pr-8 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
             >
-              <option value="">Block</option>
+              <option value="">Select Block</option>
               {blocks.map(block => (
                 <option key={block} value={block}>{block}</option>
               ))}
@@ -666,7 +650,7 @@ const Students: React.FC = () => {
               onChange={(e) => setSelectedStatus(e.target.value)}
               className="appearance-none bg-white border border-gray-300 rounded-lg px-3 py-2 pr-8 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
             >
-              <option value="">Fee Status</option>
+              <option value="">Select Fee Status</option>
               <option value="paid">Paid</option>
               <option value="pending">Pending</option>
               <option value="overdue">Overdue</option>
@@ -674,6 +658,15 @@ const Students: React.FC = () => {
             <ChevronDown className="absolute right-2 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
           </div>
         </div>
+
+        {/* Add Student Button */}
+        <button 
+          onClick={() => setIsAddModalOpen(true)}
+          className="flex items-center space-x-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+        >
+          <Plus className="w-4 h-4" />
+          <span>Add new student</span>
+        </button>
       </div>
 
       {/* Results Count */}
