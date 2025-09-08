@@ -10,7 +10,15 @@ import {
   ChevronDown,
   X,
   Check,
-  AlertCircle
+  AlertCircle,
+  ArrowLeft,
+  Calendar,
+  Mail,
+  Phone,
+  MapPin,
+  User,
+  GraduationCap,
+  CreditCard
 } from 'lucide-react';
 import Table, { TableColumn } from '../../components/admin/table';
 
@@ -26,6 +34,17 @@ interface Student {
   dueAmount: number;
   email?: string;
   phone?: string;
+  dateOfBirth?: string;
+  gender?: string;
+  mailingAddress?: string;
+  feeHistory?: FeeRecord[];
+}
+
+interface FeeRecord {
+  invoiceId: string;
+  date: string;
+  amount: number;
+  status: 'paid' | 'pending' | 'overdue';
 }
 
 interface NewStudentData {
@@ -37,7 +56,7 @@ interface NewStudentData {
   admissionDate: string;
 }
 
-// Sample student data
+// Sample student data with extended information
 const initialStudentsData: Student[] = [
   {
     id: 'ST001',
@@ -50,7 +69,14 @@ const initialStudentsData: Student[] = [
     feeStatus: 'paid',
     dueAmount: 0,
     email: 'arun.kumar@email.com',
-    phone: '+91 9876543210'
+    phone: '+91 98765 43210',
+    dateOfBirth: '2002-05-20',
+    gender: 'Male',
+    mailingAddress: '123 Main St, Bangalore, KA 560001',
+    feeHistory: [
+      { invoiceId: 'fee1', date: '2023-01-10', amount: 50000, status: 'paid' },
+      { invoiceId: 'fee2', date: '2023-07-10', amount: 50000, status: 'paid' }
+    ]
   },
   {
     id: 'ST002', 
@@ -63,7 +89,14 @@ const initialStudentsData: Student[] = [
     feeStatus: 'overdue',
     dueAmount: 15000,
     email: 'priya.sharma@email.com',
-    phone: '+91 9876543211'
+    phone: '+91 98765 43211',
+    dateOfBirth: '2001-08-15',
+    gender: 'Female',
+    mailingAddress: '456 Park Ave, Chennai, TN 600001',
+    feeHistory: [
+      { invoiceId: 'fee3', date: '2023-02-15', amount: 50000, status: 'paid' },
+      { invoiceId: 'fee4', date: '2023-08-15', amount: 50000, status: 'overdue' }
+    ]
   },
   {
     id: 'ST003',
@@ -76,7 +109,14 @@ const initialStudentsData: Student[] = [
     feeStatus: 'paid',
     dueAmount: 0,
     email: 'raj.patel@email.com',
-    phone: '+91 9876543212'
+    phone: '+91 98765 43212',
+    dateOfBirth: '2002-03-10',
+    gender: 'Male',
+    mailingAddress: '789 Center St, Mumbai, MH 400001',
+    feeHistory: [
+      { invoiceId: 'fee5', date: '2023-01-05', amount: 50000, status: 'paid' },
+      { invoiceId: 'fee6', date: '2023-07-05', amount: 50000, status: 'paid' }
+    ]
   },
   {
     id: 'ST004',
@@ -89,7 +129,14 @@ const initialStudentsData: Student[] = [
     feeStatus: 'pending',
     dueAmount: 8500,
     email: 'sneha.reddy@email.com',
-    phone: '+91 9876543213'
+    phone: '+91 98765 43213',
+    dateOfBirth: '2002-11-25',
+    gender: 'Female',
+    mailingAddress: '321 South St, Hyderabad, TS 500001',
+    feeHistory: [
+      { invoiceId: 'fee7', date: '2023-03-01', amount: 50000, status: 'paid' },
+      { invoiceId: 'fee8', date: '2023-09-01', amount: 50000, status: 'pending' }
+    ]
   },
   {
     id: 'ST005',
@@ -102,7 +149,14 @@ const initialStudentsData: Student[] = [
     feeStatus: 'paid',
     dueAmount: 0,
     email: 'vikram.singh@email.com',
-    phone: '+91 9876543214'
+    phone: '+91 98765 43214',
+    dateOfBirth: '2001-12-05',
+    gender: 'Male',
+    mailingAddress: '654 North Ave, Delhi, DL 110001',
+    feeHistory: [
+      { invoiceId: 'fee9', date: '2023-01-20', amount: 50000, status: 'paid' },
+      { invoiceId: 'fee10', date: '2023-07-20', amount: 50000, status: 'paid' }
+    ]
   },
   {
     id: 'ST006',
@@ -115,9 +169,212 @@ const initialStudentsData: Student[] = [
     feeStatus: 'overdue',
     dueAmount: 22000,
     email: 'anita.joshi@email.com',
-    phone: '+91 9876543215'
+    phone: '+91 98765 43215',
+    dateOfBirth: '2002-04-18',
+    gender: 'Female',
+    mailingAddress: '987 East St, Pune, MH 411001',
+    feeHistory: [
+      { invoiceId: 'fee11', date: '2023-02-10', amount: 50000, status: 'paid' },
+      { invoiceId: 'fee12', date: '2023-08-10', amount: 50000, status: 'overdue' }
+    ]
   }
 ];
+
+// Student Profile Component
+const StudentProfile: React.FC<{
+  student: Student;
+  onBack: () => void;
+}> = ({ student, onBack }) => {
+  const formatCurrency = (amount: number): string => {
+    return new Intl.NumberFormat('en-IN', {
+      style: 'currency',
+      currency: 'INR',
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0,
+    }).format(amount);
+  };
+
+  const formatDate = (dateString: string): string => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric'
+    });
+  };
+
+  const StatusBadge: React.FC<{ status: string }> = ({ status }) => {
+    const getStatusClasses = () => {
+      const baseClasses = "px-2 py-1 rounded-full text-xs font-medium";
+      
+      switch (status) {
+        case 'paid':
+          return `${baseClasses} bg-green-100 text-green-700`;
+        case 'pending':
+          return `${baseClasses} bg-yellow-100 text-yellow-700`;
+        case 'overdue':
+          return `${baseClasses} bg-red-100 text-red-700`;
+        default:
+          return `${baseClasses} bg-gray-100 text-gray-700`;
+      }
+    };
+
+    return (
+      <span className={getStatusClasses()}>
+        {status.charAt(0).toUpperCase() + status.slice(1)}
+      </span>
+    );
+  };
+
+  return (
+    <div className="space-y-6">
+      {/* Back Button */}
+      <button
+        onClick={onBack}
+        className="flex items-center space-x-2 text-blue-600 hover:text-blue-700 transition-colors"
+      >
+        <ArrowLeft className="w-4 h-4" />
+        <span>Back to Student List</span>
+      </button>
+
+      {/* Header Section */}
+      <div className="flex items-center space-x-4">
+        <div className="w-20 h-20 bg-blue-100 rounded-full flex items-center justify-center">
+          <span className="text-2xl font-bold text-blue-700">{student.avatar}</span>
+        </div>
+        <div>
+          <h1 className="text-3xl font-bold text-gray-900">{student.name}</h1>
+          <p className="text-gray-500">Student ID: {student.studentId}</p>
+        </div>
+      </div>
+
+      {/* Content Grid */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Personal Information */}
+        <div className="bg-white rounded-lg border border-gray-200 p-6">
+          <h2 className="text-xl font-semibold text-gray-900 mb-4 flex items-center">
+            <User className="w-5 h-5 mr-2" />
+            Personal Information
+          </h2>
+          <div className="space-y-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm text-gray-500 mb-1">Full Name</label>
+                <p className="font-medium text-gray-900">{student.name}</p>
+              </div>
+              <div>
+                <label className="block text-sm text-gray-500 mb-1">Date of Birth</label>
+                <p className="font-medium text-gray-900">
+                  {student.dateOfBirth ? formatDate(student.dateOfBirth) : 'Not provided'}
+                </p>
+              </div>
+              <div>
+                <label className="block text-sm text-gray-500 mb-1">Gender</label>
+                <p className="font-medium text-gray-900">{student.gender || 'Not provided'}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Contact Information */}
+        <div className="bg-white rounded-lg border border-gray-200 p-6">
+          <h2 className="text-xl font-semibold text-gray-900 mb-4 flex items-center">
+            <Phone className="w-5 h-5 mr-2" />
+            Contact Information
+          </h2>
+          <div className="space-y-4">
+            <div>
+              <label className="block text-sm text-gray-500 mb-1">Email Address</label>
+              <p className="font-medium text-gray-900 flex items-center">
+                <Mail className="w-4 h-4 mr-2 text-gray-400" />
+                {student.email || 'Not provided'}
+              </p>
+            </div>
+            <div>
+              <label className="block text-sm text-gray-500 mb-1">Phone Number</label>
+              <p className="font-medium text-gray-900 flex items-center">
+                <Phone className="w-4 h-4 mr-2 text-gray-400" />
+                {student.phone || 'Not provided'}
+              </p>
+            </div>
+            <div>
+              <label className="block text-sm text-gray-500 mb-1">Mailing Address</label>
+              <p className="font-medium text-gray-900 flex items-start">
+                <MapPin className="w-4 h-4 mr-2 text-gray-400 mt-0.5 flex-shrink-0" />
+                {student.mailingAddress || 'Not provided'}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* Academic Information */}
+        <div className="bg-white rounded-lg border border-gray-200 p-6">
+          <h2 className="text-xl font-semibold text-gray-900 mb-4 flex items-center">
+            <GraduationCap className="w-5 h-5 mr-2" />
+            Academic Information
+          </h2>
+          <div className="space-y-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm text-gray-500 mb-1">Admission Date</label>
+                <p className="font-medium text-gray-900 flex items-center">
+                  <Calendar className="w-4 h-4 mr-2 text-gray-400" />
+                  {formatDate(student.admissionDate)}
+                </p>
+              </div>
+              <div>
+                <label className="block text-sm text-gray-500 mb-1">Block</label>
+                <p className="font-medium text-gray-900">{student.block}</p>
+              </div>
+              <div>
+                <label className="block text-sm text-gray-500 mb-1">Room Number</label>
+                <p className="font-medium text-gray-900">{student.roomNo}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Fee History */}
+        <div className="bg-white rounded-lg border border-gray-200 p-6">
+          <h2 className="text-xl font-semibold text-gray-900 mb-4 flex items-center">
+            <CreditCard className="w-5 h-5 mr-2" />
+            Fee History
+          </h2>
+          <div className="space-y-3">
+            {student.feeHistory && student.feeHistory.length > 0 ? (
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm">
+                  <thead className="bg-gray-50">
+                    <tr>
+                      <th className="px-3 py-2 text-left text-gray-500 font-medium">Invoice ID</th>
+                      <th className="px-3 py-2 text-left text-gray-500 font-medium">Date</th>
+                      <th className="px-3 py-2 text-left text-gray-500 font-medium">Amount</th>
+                      <th className="px-3 py-2 text-left text-gray-500 font-medium">Status</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-200">
+                    {student.feeHistory.map((fee) => (
+                      <tr key={fee.invoiceId}>
+                        <td className="px-3 py-2 font-medium text-gray-900">{fee.invoiceId}</td>
+                        <td className="px-3 py-2 text-gray-600">{formatDate(fee.date)}</td>
+                        <td className="px-3 py-2 font-medium text-gray-900">{formatCurrency(fee.amount)}</td>
+                        <td className="px-3 py-2">
+                          <StatusBadge status={fee.status} />
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            ) : (
+              <p className="text-gray-500 text-center py-4">No fee history available</p>
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
 
 // Notification Component
 const Notification: React.FC<{
@@ -407,6 +664,7 @@ const Students: React.FC = () => {
   const [selectedStudents, setSelectedStudents] = useState<Student[]>([]);
   const [sortConfig, setSortConfig] = useState<{ column: string; direction: 'asc' | 'desc' } | null>(null);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [selectedStudent, setSelectedStudent] = useState<Student | null>(null);
   const [notification, setNotification] = useState<{
     type: 'success' | 'error' | 'info';
     message: string;
@@ -452,7 +710,11 @@ const Students: React.FC = () => {
       feeStatus: 'pending',
       dueAmount: 10000, // Default due amount for new students
       email: newStudentData.email,
-      phone: newStudentData.phone
+      phone: newStudentData.phone,
+      dateOfBirth: undefined,
+      gender: undefined,
+      mailingAddress: undefined,
+      feeHistory: []
     };
 
     setStudentsData(prev => [newStudent, ...prev]);
@@ -508,8 +770,7 @@ const Students: React.FC = () => {
   const handleAction = (action: string, student: Student) => {
     switch (action) {
       case 'view':
-        console.log('View student:', student);
-        showNotification('info', `Viewing details for ${student.name}`);
+        setSelectedStudent(student);
         break;
       case 'edit':
         console.log('Edit student:', student);
@@ -526,18 +787,35 @@ const Students: React.FC = () => {
     setSortConfig({ column, direction });
   };
 
+  const handleStudentClick = (student: Student) => {
+    setSelectedStudent(student);
+  };
+
+  // If a student is selected, show the profile view
+  if (selectedStudent) {
+    return (
+      <StudentProfile 
+        student={selectedStudent} 
+        onBack={() => setSelectedStudent(null)} 
+      />
+    );
+  }
+
   const columns: TableColumn<Student>[] = [
     {
       key: 'name',
       header: 'Student',
       sortable: true,
       render: (_, student) => (
-        <div className="flex items-center space-x-3">
+        <div 
+          className="flex items-center space-x-3 cursor-pointer hover:bg-blue-50 -m-2 p-2 rounded transition-colors"
+          onClick={() => handleStudentClick(student)}
+        >
           <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
             <span className="text-sm font-medium text-blue-700">{student.avatar}</span>
           </div>
           <div>
-            <div className="font-medium text-gray-900">{student.name}</div>
+            <div className="font-medium text-gray-900 hover:text-blue-600 transition-colors">{student.name}</div>
             <div className="text-sm text-gray-500">{student.email}</div>
           </div>
         </div>
