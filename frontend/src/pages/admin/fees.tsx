@@ -89,7 +89,6 @@ const FeeBreakdownChart: React.FC = () => {
               const percentage = item.value / total;
               const strokeDasharray = `${percentage * circumference} ${circumference}`;
               
-              // Calculate offset for each segment
               const prevPercentages = data.slice(0, index).reduce((sum, prev) => sum + prev.value / total, 0);
               const strokeDashoffset = -prevPercentages * circumference;
               
@@ -144,7 +143,6 @@ const Fees: React.FC = () => {
       id: 1,
       name: "Aditi Sharma",
       roomNo: "A-102",
-      newRoom: "A-102",
       amount: 430,
       validity: 180,
       status: "paid"
@@ -152,8 +150,7 @@ const Fees: React.FC = () => {
     {
       id: 2,
       name: "Rahul Singh",
-      roomNo: "B-203",
-      newRoom: "B-205",
+      roomNo: "B-205",
       amount: 72000,
       validity: 8.40,
       status: "pending"
@@ -161,8 +158,7 @@ const Fees: React.FC = () => {
     {
       id: 3,
       name: "Priya Patel",
-      roomNo: "C-203",
-      newRoom: "C-301",
+      roomNo: "C-301",
       amount: 6000,
       validity: null,
       status: "overdue"
@@ -171,7 +167,6 @@ const Fees: React.FC = () => {
       id: 4,
       name: "Amit Kumar",
       roomNo: "A-105",
-      newRoom: "A-105",
       amount: 5.5,
       validity: null,
       status: "overdue"
@@ -203,94 +198,38 @@ const Fees: React.FC = () => {
     <div className="space-y-6">
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
-        <StatsCard
-          title="Total Collected"
-          value="₹5,80,000"
-          bgColor="#10B981"
-          icon={<CheckCircle className="w-5 h-5" />}
-          trend="↗"
-        />
-        <StatsCard
-          title="Pending Fees"
-          value="₹1,20,000"
-          bgColor="#F59E0B"
-          icon={<AlertTriangle className="w-5 h-5" />}
-          trend="↓"
-        />
-        <StatsCard
-          title="Overdue Fees"
-          value="₹45,000"
-          bgColor="#EF4444"
-          icon={<AlertTriangle className="w-5 h-5" />}
-          trend="!"
-        />
-        <StatsCard
-          title="Collection %"
-          value="82%"
-          bgColor="#3B82F6"
-          icon={<TrendingUp className="w-5 h-5" />}
-        />
-        <StatsCard
-          title="Students with Pending Fees"
-          value="180"
-          bgColor="#6B7280"
-          icon={<Users className="w-5 h-5" />}
-        />
+        <StatsCard title="Total Collected" value="₹5,80,000" bgColor="#10B981" icon={<CheckCircle className="w-5 h-5" />} trend="↗" />
+        <StatsCard title="Pending Fees" value="₹1,20,000" bgColor="#F59E0B" icon={<AlertTriangle className="w-5 h-5" />} trend="↓" />
+        <StatsCard title="Overdue Fees" value="₹45,000" bgColor="#EF4444" icon={<AlertTriangle className="w-5 h-5" />} trend="!" />
+        <StatsCard title="Collection %" value="82%" bgColor="#3B82F6" icon={<TrendingUp className="w-5 h-5" />} />
+        <StatsCard title="Students with Pending Fees" value="180" bgColor="#6B7280" icon={<Users className="w-5 h-5" />} />
       </div>
 
       {/* Main Content Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Pending Students List */}
         <div className="lg:col-span-2">
           <div className="bg-white rounded-xl shadow-sm">
             <div className="p-6 border-b border-gray-200">
               <h2 className="text-lg font-semibold text-gray-900">Pending Students List</h2>
             </div>
-            
             <div className="overflow-x-auto">
               <table className="w-full">
                 <thead className="bg-gray-50">
                   <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Name
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Room No.
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Room No
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Amount
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Validity
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Status
-                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Room No.</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Validity</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
                   </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
                   {students.map((student) => (
                     <tr key={student.id} className="hover:bg-gray-50 transition-colors">
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm font-medium text-gray-900">
-                          {student.name}
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        {student.roomNo}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        {student.newRoom}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 font-medium">
-                        {formatAmount(student.amount)}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        {student.validity || '-'}
-                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{student.name}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{student.roomNo}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 font-medium">{formatAmount(student.amount)}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{student.validity || '-'}</td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <span className={getStatusBadge(student.status)}>
                           {student.status.charAt(0).toUpperCase() + student.status.slice(1)}
