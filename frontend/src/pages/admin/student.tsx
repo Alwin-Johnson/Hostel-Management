@@ -13,6 +13,7 @@ import {
   AlertCircle
 } from 'lucide-react';
 import Table, { TableColumn } from '../../components/admin/table';
+import StudentProfile from './studentprofile';
 
 interface Student {
   id: string;
@@ -26,6 +27,17 @@ interface Student {
   dueAmount: number;
   email?: string;
   phone?: string;
+  dateOfBirth?: string;
+  gender?: string;
+  mailingAddress?: string;
+  feeHistory?: FeeRecord[];
+}
+
+interface FeeRecord {
+  invoiceId: string;
+  date: string;
+  amount: number;
+  status: 'paid' | 'pending' | 'overdue';
 }
 
 interface NewStudentData {
@@ -37,7 +49,7 @@ interface NewStudentData {
   admissionDate: string;
 }
 
-// Sample student data
+// Sample student data with extended information
 const initialStudentsData: Student[] = [
   {
     id: 'ST001',
@@ -50,7 +62,14 @@ const initialStudentsData: Student[] = [
     feeStatus: 'paid',
     dueAmount: 0,
     email: 'arun.kumar@email.com',
-    phone: '+91 9876543210'
+    phone: '+91 98765 43210',
+    dateOfBirth: '2002-05-20',
+    gender: 'Male',
+    mailingAddress: '123 Main St, Bangalore, KA 560001',
+    feeHistory: [
+      { invoiceId: 'fee1', date: '2023-01-10', amount: 50000, status: 'paid' },
+      { invoiceId: 'fee2', date: '2023-07-10', amount: 50000, status: 'paid' }
+    ]
   },
   {
     id: 'ST002', 
@@ -63,7 +82,14 @@ const initialStudentsData: Student[] = [
     feeStatus: 'overdue',
     dueAmount: 15000,
     email: 'priya.sharma@email.com',
-    phone: '+91 9876543211'
+    phone: '+91 98765 43211',
+    dateOfBirth: '2001-08-15',
+    gender: 'Female',
+    mailingAddress: '456 Park Ave, Chennai, TN 600001',
+    feeHistory: [
+      { invoiceId: 'fee3', date: '2023-02-15', amount: 50000, status: 'paid' },
+      { invoiceId: 'fee4', date: '2023-08-15', amount: 50000, status: 'overdue' }
+    ]
   },
   {
     id: 'ST003',
@@ -76,7 +102,14 @@ const initialStudentsData: Student[] = [
     feeStatus: 'paid',
     dueAmount: 0,
     email: 'raj.patel@email.com',
-    phone: '+91 9876543212'
+    phone: '+91 98765 43212',
+    dateOfBirth: '2002-03-10',
+    gender: 'Male',
+    mailingAddress: '789 Center St, Mumbai, MH 400001',
+    feeHistory: [
+      { invoiceId: 'fee5', date: '2023-01-05', amount: 50000, status: 'paid' },
+      { invoiceId: 'fee6', date: '2023-07-05', amount: 50000, status: 'paid' }
+    ]
   },
   {
     id: 'ST004',
@@ -89,7 +122,14 @@ const initialStudentsData: Student[] = [
     feeStatus: 'pending',
     dueAmount: 8500,
     email: 'sneha.reddy@email.com',
-    phone: '+91 9876543213'
+    phone: '+91 98765 43213',
+    dateOfBirth: '2002-11-25',
+    gender: 'Female',
+    mailingAddress: '321 South St, Hyderabad, TS 500001',
+    feeHistory: [
+      { invoiceId: 'fee7', date: '2023-03-01', amount: 50000, status: 'paid' },
+      { invoiceId: 'fee8', date: '2023-09-01', amount: 50000, status: 'pending' }
+    ]
   },
   {
     id: 'ST005',
@@ -102,7 +142,14 @@ const initialStudentsData: Student[] = [
     feeStatus: 'paid',
     dueAmount: 0,
     email: 'vikram.singh@email.com',
-    phone: '+91 9876543214'
+    phone: '+91 98765 43214',
+    dateOfBirth: '2001-12-05',
+    gender: 'Male',
+    mailingAddress: '654 North Ave, Delhi, DL 110001',
+    feeHistory: [
+      { invoiceId: 'fee9', date: '2023-01-20', amount: 50000, status: 'paid' },
+      { invoiceId: 'fee10', date: '2023-07-20', amount: 50000, status: 'paid' }
+    ]
   },
   {
     id: 'ST006',
@@ -115,7 +162,14 @@ const initialStudentsData: Student[] = [
     feeStatus: 'overdue',
     dueAmount: 22000,
     email: 'anita.joshi@email.com',
-    phone: '+91 9876543215'
+    phone: '+91 98765 43215',
+    dateOfBirth: '2002-04-18',
+    gender: 'Female',
+    mailingAddress: '987 East St, Pune, MH 411001',
+    feeHistory: [
+      { invoiceId: 'fee11', date: '2023-02-10', amount: 50000, status: 'paid' },
+      { invoiceId: 'fee12', date: '2023-08-10', amount: 50000, status: 'overdue' }
+    ]
   }
 ];
 
@@ -407,6 +461,7 @@ const Students: React.FC = () => {
   const [selectedStudents, setSelectedStudents] = useState<Student[]>([]);
   const [sortConfig, setSortConfig] = useState<{ column: string; direction: 'asc' | 'desc' } | null>(null);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [selectedStudent, setSelectedStudent] = useState<Student | null>(null);
   const [notification, setNotification] = useState<{
     type: 'success' | 'error' | 'info';
     message: string;
@@ -452,7 +507,11 @@ const Students: React.FC = () => {
       feeStatus: 'pending',
       dueAmount: 10000, // Default due amount for new students
       email: newStudentData.email,
-      phone: newStudentData.phone
+      phone: newStudentData.phone,
+      dateOfBirth: undefined,
+      gender: undefined,
+      mailingAddress: undefined,
+      feeHistory: []
     };
 
     setStudentsData(prev => [newStudent, ...prev]);
@@ -508,8 +567,7 @@ const Students: React.FC = () => {
   const handleAction = (action: string, student: Student) => {
     switch (action) {
       case 'view':
-        console.log('View student:', student);
-        showNotification('info', `Viewing details for ${student.name}`);
+        setSelectedStudent(student);
         break;
       case 'edit':
         console.log('Edit student:', student);
@@ -526,18 +584,35 @@ const Students: React.FC = () => {
     setSortConfig({ column, direction });
   };
 
+  const handleStudentClick = (student: Student) => {
+    setSelectedStudent(student);
+  };
+
+  // If a student is selected, show the profile view
+  if (selectedStudent) {
+    return (
+      <StudentProfile 
+        student={selectedStudent} 
+        onBack={() => setSelectedStudent(null)} 
+      />
+    );
+  }
+
   const columns: TableColumn<Student>[] = [
     {
       key: 'name',
       header: 'Student',
       sortable: true,
       render: (_, student) => (
-        <div className="flex items-center space-x-3">
+        <div 
+          className="flex items-center space-x-3 cursor-pointer hover:bg-blue-50 -m-2 p-2 rounded transition-colors"
+          onClick={() => handleStudentClick(student)}
+        >
           <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
             <span className="text-sm font-medium text-blue-700">{student.avatar}</span>
           </div>
           <div>
-            <div className="font-medium text-gray-900">{student.name}</div>
+            <div className="font-medium text-gray-900 hover:text-blue-600 transition-colors">{student.name}</div>
             <div className="text-sm text-gray-500">{student.email}</div>
           </div>
         </div>
@@ -613,23 +688,7 @@ const Students: React.FC = () => {
         onSubmit={handleAddStudent}
       />
 
-      {/* Header Section */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h2 className="text-2xl font-bold text-gray-900">Students Management</h2>
-          <p className="text-gray-600">Manage student records and information</p>
-        </div>
-        
-        <button 
-          onClick={() => setIsAddModalOpen(true)}
-          className="flex items-center space-x-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
-        >
-          <Plus className="w-4 h-4" />
-          <span>Add new student</span>
-        </button>
-      </div>
-
-      {/* Filters and Search */}
+      {/* Header Section with Filters and Add Button */}
       <div className="flex items-center justify-between space-x-4">
         <div className="flex items-center space-x-4 flex-1">
           {/* Search */}
@@ -651,7 +710,7 @@ const Students: React.FC = () => {
               onChange={(e) => setSelectedBlock(e.target.value)}
               className="appearance-none bg-white border border-gray-300 rounded-lg px-3 py-2 pr-8 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
             >
-              <option value="">Block</option>
+              <option value="">Select Block</option>
               {blocks.map(block => (
                 <option key={block} value={block}>{block}</option>
               ))}
@@ -666,7 +725,7 @@ const Students: React.FC = () => {
               onChange={(e) => setSelectedStatus(e.target.value)}
               className="appearance-none bg-white border border-gray-300 rounded-lg px-3 py-2 pr-8 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
             >
-              <option value="">Fee Status</option>
+              <option value="">Select Fee Status</option>
               <option value="paid">Paid</option>
               <option value="pending">Pending</option>
               <option value="overdue">Overdue</option>
@@ -674,6 +733,15 @@ const Students: React.FC = () => {
             <ChevronDown className="absolute right-2 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
           </div>
         </div>
+
+        {/* Add Student Button */}
+        <button 
+          onClick={() => setIsAddModalOpen(true)}
+          className="flex items-center space-x-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+        >
+          <Plus className="w-4 h-4" />
+          <span>Add new student</span>
+        </button>
       </div>
 
       {/* Results Count */}
