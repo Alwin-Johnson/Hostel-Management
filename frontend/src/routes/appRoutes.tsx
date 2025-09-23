@@ -1,125 +1,245 @@
-// src/routes/appRoutes.tsx
+// src/routes/AppRoutes.tsx
 import React, { useState } from 'react';
 import { Routes, Route, Navigate, useNavigate } from 'react-router-dom';
+
+// ----------------------
+// Admin Pages & Layout
+// ----------------------
 import AdminLayout from '../layouts/adminlayout';
 import Dashboard from '../pages/admin/dashboard';
 import Students from '../pages/admin/student';
 import Fees from '../pages/admin/fees';
 import Mess from '../pages/admin/mess';
 import { AdminLogin } from '../pages/admin/login';
+
+// ----------------------
+// Student Pages & Layout
+// ----------------------
 import LaunchingPage from '../pages/landing/home';
+import { StudentPortal } from '../pages/student/studentportal';
+import StudentLayout from '../layouts/studentlayout';   
+import { OverviewTab } from '../pages/student/overviewTab';
+import { Login as StudentLogin } from '../pages/student/login';
+import { NewAdmission } from '../pages/student/newadmission';
+import StudentFees from '../pages/student/fees';
+import { StudentAttendance } from '../pages/student/attendance';
+import { StudentMess } from '../pages/student/mess';
+import { StudentComplaints } from '../pages/student/complaints';
+import StudentProfile from '../pages/student/profile';
 
-// Simple test component
-const AdminComplaints: React.FC = () => <div>Complaints Content Coming Soon...</div>;
-
-// Simple test component for Student portal
-const StudentPortal: React.FC = () => <div>Student portal coming soon...</div>;
-
-
+// ----------------------
 // Protected Route
+// ----------------------
 interface ProtectedRouteProps {
   children: React.ReactNode;
   isAuthenticated: boolean;
+  redirectPath?: string;
 }
-const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, isAuthenticated }) => {
-  if (!isAuthenticated) return <Navigate to="/login" replace />;
+const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, isAuthenticated, redirectPath = '/' }) => {
+  if (!isAuthenticated) return <Navigate to={redirectPath} replace />;
   return <>{children}</>;
 };
 
-// AppRoutes
+// ----------------------
+// App Routes
+// ----------------------
 const AppRoutes: React.FC = () => {
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
+  const [isAdminAuthenticated, setIsAdminAuthenticated] = useState(false);
+  const [isStudentAuthenticated, setIsStudentAuthenticated] = useState(false);
   const navigate = useNavigate();
 
-  const handleLogin = () => setIsAuthenticated(true);
-  const handleLogout = () => {
-    setIsAuthenticated(false);
-    navigate('/'); // Go back to LaunchingPage
-  };
-
-  // Handles clicks from LaunchingPage cards
+  // ----------------------
+  // Auth handlers
+  // ----------------------
+  const handleAdminLogin = () => setIsAdminAuthenticated(true);
+  const handleStudentLogin = () => setIsStudentAuthenticated(true);
+  const handleAdminLogout = () => { setIsAdminAuthenticated(false); navigate('/'); };
+  const handleStudentLogout = () => { setIsStudentAuthenticated(false); navigate('/student/login'); };
   const handlePageChange = (target: 'admin' | 'student') => {
-    if (target === 'admin') navigate('/login'); // redirect admin
-    if (target === 'student') navigate('/student'); // show message
+    if (target === 'admin') navigate('/login');
+    if (target === 'student') navigate('/student/login');
   };
 
+  // Wrappers
+  const AdminLoginWrapper: React.FC<{ onLogin: () => void }> = ({ onLogin }) => {
+    const loginSuccess = () => { onLogin(); navigate('/admin/dashboard'); };
+    return <AdminLogin onLogin={loginSuccess} onPageChange={() => navigate('/')} />;
+  };
 
-  // Login Wrapper for Admin
-  const LoginWrapper: React.FC<{ onLogin: () => void }> = ({ onLogin }) => {
-    const handleAdminLogin = () => {
-      onLogin();
-      navigate('/admin/dashboard');
-    };
-    return <AdminLogin onLogin={handleAdminLogin} onPageChange={() => navigate('/')} />;
+  const StudentLoginWrapper: React.FC<{ onLogin: () => void }> = ({ onLogin }) => {
+    const loginSuccess = () => { onLogin(); navigate('/student/dashboard'); };
+    return <StudentLogin onLogin={loginSuccess} />;
+  };
+
+  const NewAdmissionWrapper: React.FC = () => {
+    const handleAdmissionComplete = () => navigate('/student/login');
+    return <NewAdmission onPageChange={handleAdmissionComplete} />;
   };
 
   return (
     <Routes>
-      {/* Root - Launching Page */}
+      {/* Root */}
       <Route path="/" element={<LaunchingPage onPageChange={handlePageChange} />} />
 
-      <Route path="/student" element={<StudentPortal />} />
-
-
-      {/* Admin Login */}
+      {/* ----------------------
+          Student Routes
+      ---------------------- */}
+      <Route path="/student" element={<StudentPortal />}>
       <Route
-        path="/login"
+          path="/student/login"
+          element={
+            isStudentAuthenticated ? 
+      <Navigate to="/student/dashboard" replace /> : 
+      <StudentLoginWrapper onLogin={handleStudentLogin} />
+      }
+    />
+    <Route path="new-admission" element={<NewAdmissionWrapper />} />
+    </Route>
+
+      
+
+      <Route path="/student/new-admission" element={<NewAdmissionWrapper />} />
+
+      {/* Student protected routes (like admin layout) */}
+      <Route
+        path="/student"
         element={
-          isAuthenticated ? (
-            <Navigate to="/admin/dashboard" replace />
-          ) : (
-            <LoginWrapper onLogin={handleLogin} />
-          )
+          <ProtectedRoute isAuthenticated={isStudentAuthenticated} redirectPath="/student/login">
+            <StudentLayout onLogout={handleStudentLogout}>
+              <Navigate to="/student/dashboard" replace />
+            </StudentLayout>
+          </ProtectedRoute>
         }
       />
 
-      {/* Protected Admin Routes */}
+      <Route
+        path="/student/dashboard"
+        element={
+          <ProtectedRoute isAuthenticated={isStudentAuthenticated} redirectPath="/student/login">
+            <StudentLayout onLogout={handleStudentLogout}>
+              <OverviewTab />
+            </StudentLayout>
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/student/profile"
+        element={
+          <ProtectedRoute isAuthenticated={isStudentAuthenticated} redirectPath="/student/login">
+            <StudentLayout onLogout={handleStudentLogout}>
+              <StudentProfile />
+            </StudentLayout>
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/student/fees"
+        element={
+          <ProtectedRoute isAuthenticated={isStudentAuthenticated} redirectPath="/student/login">
+            <StudentLayout onLogout={handleStudentLogout}>
+              <StudentFees />
+            </StudentLayout>
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/student/attendance"
+        element={
+          <ProtectedRoute isAuthenticated={isStudentAuthenticated} redirectPath="/student/login">
+            <StudentLayout onLogout={handleStudentLogout}>
+              <StudentAttendance />
+            </StudentLayout>
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/student/mess"
+        element={
+          <ProtectedRoute isAuthenticated={isStudentAuthenticated} redirectPath="/student/login">
+            <StudentLayout onLogout={handleStudentLogout}>
+              <StudentMess />
+            </StudentLayout>
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/student/complaints"
+        element={
+          <ProtectedRoute isAuthenticated={isStudentAuthenticated} redirectPath="/student/login">
+            <StudentLayout onLogout={handleStudentLogout}>
+              <StudentComplaints />
+            </StudentLayout>
+          </ProtectedRoute>
+        }
+      />
+
+      {/* ----------------------
+          Admin Routes
+      ---------------------- */}
+      <Route
+        path="/login"
+        element={
+          isAdminAuthenticated ? 
+            <Navigate to="/admin/dashboard" replace /> : 
+            <AdminLoginWrapper onLogin={handleAdminLogin} />
+        }
+      />
+      
       <Route
         path="/admin/dashboard"
         element={
-          <ProtectedRoute isAuthenticated={isAuthenticated}>
-            <AdminLayout pageTitle="Dashboard" onLogout={handleLogout}>
+          <ProtectedRoute isAuthenticated={isAdminAuthenticated}>
+            <AdminLayout pageTitle="Dashboard" onLogout={handleAdminLogout}>
               <Dashboard />
             </AdminLayout>
           </ProtectedRoute>
         }
       />
+      
       <Route
         path="/admin/students"
         element={
-          <ProtectedRoute isAuthenticated={isAuthenticated}>
-            <AdminLayout pageTitle="Students Management" onLogout={handleLogout}>
+          <ProtectedRoute isAuthenticated={isAdminAuthenticated}>
+            <AdminLayout pageTitle="Students Management" onLogout={handleAdminLogout}>
               <Students />
             </AdminLayout>
           </ProtectedRoute>
         }
       />
+      
       <Route
         path="/admin/fees"
         element={
-          <ProtectedRoute isAuthenticated={isAuthenticated}>
-            <AdminLayout pageTitle="Fees Management" onLogout={handleLogout}>
+          <ProtectedRoute isAuthenticated={isAdminAuthenticated}>
+            <AdminLayout pageTitle="Fees Management" onLogout={handleAdminLogout}>
               <Fees />
             </AdminLayout>
           </ProtectedRoute>
         }
       />
+      
       <Route
         path="/admin/mess"
         element={
-          <ProtectedRoute isAuthenticated={isAuthenticated}>
-            <AdminLayout pageTitle="Mess Management" onLogout={handleLogout}>
+          <ProtectedRoute isAuthenticated={isAdminAuthenticated}>
+            <AdminLayout pageTitle="Mess Management" onLogout={handleAdminLogout}>
               <Mess />
             </AdminLayout>
           </ProtectedRoute>
         }
       />
+      
       <Route
         path="/admin/complaints"
         element={
-          <ProtectedRoute isAuthenticated={isAuthenticated}>
-            <AdminLayout pageTitle="Complaints" onLogout={handleLogout}>
-              <AdminComplaints />
+          <ProtectedRoute isAuthenticated={isAdminAuthenticated}>
+            <AdminLayout pageTitle="Complaints" onLogout={handleAdminLogout}>
+              <div>Complaints Content Coming Soon...</div>
             </AdminLayout>
           </ProtectedRoute>
         }
