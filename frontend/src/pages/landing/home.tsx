@@ -17,6 +17,7 @@ export function LandingPage({ onPageChange }: LandingPageProps) {
               <div className="w-12 h-12 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-xl flex items-center justify-center shadow-lg">
                 <span className="text-white font-bold text-xl">H</span>
               </div>
+              <div></div>
               <div>
                 <h1 className="text-xl font-bold bg-gradient-to-r from-gray-800 to-blue-600 bg-clip-text text-transparent">Campus Hostel</h1>
                 <p className="text-xs text-gray-500">Management System</p>
