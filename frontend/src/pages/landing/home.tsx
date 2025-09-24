@@ -1,11 +1,7 @@
 import { Button } from "../../components/admin/button";
 import { Card, CardContent } from "../../components/admin/card";
-import { Badge } from "../../components/landing/badge";
-
 import { Bell, Mail, Phone, MapPin, Users, Shield, ArrowRight, Star, Wifi, Car, Coffee, Zap, Award, Heart} from 'lucide-react';
 import { ImageWithFallback } from '../../assests/ImageWithFallback';
-import exampleImage from '../../assests/img1.png';
-
 interface LandingPageProps {
   onPageChange: (target: 'admin' | 'student') => void;
 }
@@ -21,6 +17,7 @@ export function LandingPage({ onPageChange }: LandingPageProps) {
               <div className="w-12 h-12 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-xl flex items-center justify-center shadow-lg">
                 <span className="text-white font-bold text-xl">H</span>
               </div>
+              <div></div>
               <div>
                 <h1 className="text-xl font-bold bg-gradient-to-r from-gray-800 to-blue-600 bg-clip-text text-transparent">Campus Hostel</h1>
                 <p className="text-xs text-gray-500">Management System</p>
@@ -76,32 +73,7 @@ export function LandingPage({ onPageChange }: LandingPageProps) {
                   <Phone className="w-4 h-4 group-hover:rotate-12 transition-transform" />
                 </a>
               </div>
-
-              {/* Enhanced Stats */}
-              <div className="grid grid-cols-3 gap-6 pt-8">
-                <div className="text-center group">
-                  <div className="w-16 h-16 bg-gradient-to-br from-green-100 to-emerald-100 rounded-2xl flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition-transform shadow-lg">
-                    <Users className="w-8 h-8 text-green-600" />
-                  </div>
-                  <div className="text-3xl font-bold text-gray-900">500+</div>
-                  <div className="text-sm text-gray-600">Happy Students</div>
-                </div>
-                <div className="text-center group">
-                  <div className="w-16 h-16 bg-gradient-to-br from-yellow-100 to-orange-100 rounded-2xl flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition-transform shadow-lg">
-                    <Star className="w-8 h-8 text-yellow-600" />
-                  </div>
-                  <div className="text-3xl font-bold text-gray-900">4.9★</div>
-                  <div className="text-sm text-gray-600">Google Rating</div>
-                </div>
-                <div className="text-center group">
-                  <div className="w-16 h-16 bg-gradient-to-br from-purple-100 to-pink-100 rounded-2xl flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition-transform shadow-lg">
-                    <Award className="w-8 h-8 text-purple-600" />
-                  </div>
-                  <div className="text-3xl font-bold text-gray-900">5</div>
-                  <div className="text-sm text-gray-600">Years Excellence</div>
-                </div>
-              </div>
-            </div>
+             </div>
             
             {/* Right content - Enhanced Portal Cards */}
             <div className="space-y-6">
@@ -118,7 +90,6 @@ export function LandingPage({ onPageChange }: LandingPageProps) {
                     </div>
                     <div>
                       <h3 className="text-2xl font-bold text-gray-900">Student Portal</h3>
-                      <p className="text-blue-600 font-medium">Dashboard & Services</p>
                     </div>
                   </div>
                   <p className="text-gray-600 leading-relaxed mb-6">
@@ -129,10 +100,7 @@ export function LandingPage({ onPageChange }: LandingPageProps) {
                       Get Started
                       <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
                     </Button>
-                    <div className="flex items-center text-sm text-gray-500">
-                      <Heart className="w-4 h-4 mr-1 text-red-400" />
-                      450+ active users
-                    </div>
+                    
                   </div>
                 </CardContent>
               </Card>
@@ -148,8 +116,7 @@ export function LandingPage({ onPageChange }: LandingPageProps) {
                       <Shield className="w-8 h-8 text-white" />
                     </div>
                     <div>
-                      <h3 className="text-2xl font-bold text-gray-900">Admin Dashboard</h3>
-                      <p className="text-indigo-600 font-medium">Management Portal</p>
+                      <h3 className="text-2xl font-bold text-gray-900">Admin Portal</h3>
                     </div>
                   </div>
                   <p className="text-gray-600 leading-relaxed mb-6">
@@ -160,10 +127,7 @@ export function LandingPage({ onPageChange }: LandingPageProps) {
                       Admin Access
                       <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
                     </Button>
-                    <div className="flex items-center text-sm text-gray-500">
-                      <Shield className="w-4 h-4 mr-1 text-green-400" />
-                      Secure access
-                    </div>
+                    
                   </div>
                 </CardContent>
               </Card>
@@ -176,10 +140,6 @@ export function LandingPage({ onPageChange }: LandingPageProps) {
       <section id="facilities" className="py-20 px-6 bg-white/50 backdrop-blur-sm">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
-            <div className="inline-flex items-center px-4 py-2 bg-gradient-to-r from-green-100 to-emerald-100 rounded-full text-green-700 font-medium text-sm shadow-sm mb-4">
-              <Star className="w-4 h-4 mr-2" />
-              World-Class Facilities
-            </div>
             <h3 className="text-4xl font-bold text-gray-900 mb-4">Everything You Need & More</h3>
             <p className="text-xl text-gray-600">Premium amenities designed for modern student living</p>
           </div>
@@ -240,10 +200,6 @@ export function LandingPage({ onPageChange }: LandingPageProps) {
       <section id="gallery" className="py-20 px-6 bg-gradient-to-b from-gray-50 to-white">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
-            <div className="inline-flex items-center px-4 py-2 bg-gradient-to-r from-purple-100 to-pink-100 rounded-full text-purple-700 font-medium text-sm shadow-sm mb-4">
-              <Award className="w-4 h-4 mr-2" />
-              Campus Showcase
-            </div>
             <h3 className="text-4xl font-bold text-gray-900 mb-4">Life at Campus Hostel</h3>
             <p className="text-xl text-gray-600">Discover spaces designed for your success and happiness</p>
           </div>
