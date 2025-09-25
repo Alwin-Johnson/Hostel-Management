@@ -1,18 +1,21 @@
 import React, { useState } from 'react';
 import { 
   Camera,
-  Upload,
-  Trash2,
   Filter,
-  Search
+  Search,
+  Edit2,
+  Save,
+  X
 } from 'lucide-react';
 
 const Mess = () => {
   const [searchTerm, setSearchTerm] = useState('');
+  const [editingMeal, setEditingMeal] = useState(null);
+  const [editingTime, setEditingTime] = useState(null);
   const [mealImages, setMealImages] = useState({
-    breakfast: null,
-    lunch: null,
-    dinner: null
+    breakfast: 'https://images.unsplash.com/photo-1589301760014-d929f3979dbc?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80',
+    lunch: 'https://images.unsplash.com/photo-1563379091339-03246963d67c?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80',
+    dinner: 'https://images.unsplash.com/photo-1565557623262-b51c2513a641?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80'
   });
 
   // Skipped meal stats
@@ -22,8 +25,8 @@ const Mess = () => {
     { title: 'Skipped Dinner', value: '12', bgColor: '#10B981' }
   ];
 
-  // Meal data with food items
-  const meals = [
+  // Meal data with food items - now editable with editable timing
+  const [meals, setMeals] = useState([
     {
       id: 'breakfast',
       name: 'Breakfast',
@@ -42,9 +45,9 @@ const Mess = () => {
       time: '7:00 PM - 9:00 PM', 
       items: ['Chapati (3 pieces)', 'Rice', 'Paneer Curry', 'Dal', 'Salad'],
     }
-  ];
+  ]);
 
-  // Student data
+  // Updated student data with phone numbers and skipped meals details
   const [studentsData] = useState([
     {
       id: 1,
@@ -53,9 +56,8 @@ const Mess = () => {
       lunch: 'Yes',
       dinner: 'No',
       roomNoBlock: 'A-101',
-      mealSkipped: 'Available',
-      messStatus: 'Available',
-      actions: 'active'
+      phoneNo: '+91 9876543210',
+      mealsSkipped: ['Dinner']
     },
     {
       id: 2,
@@ -64,9 +66,8 @@ const Mess = () => {
       lunch: 'Yes',
       dinner: 'Yes',
       roomNoBlock: 'B-205',
-      mealSkipped: 'Not Available',
-      messStatus: 'Not Available', 
-      actions: 'inactive'
+      phoneNo: '+91 9876543211',
+      mealsSkipped: ['Breakfast']
     },
     {
       id: 3,
@@ -75,9 +76,8 @@ const Mess = () => {
       lunch: 'No',
       dinner: 'Yes',
       roomNoBlock: 'C-301',
-      mealSkipped: 'Available',
-      messStatus: 'Available',
-      actions: 'active'
+      phoneNo: '+91 9876543212',
+      mealsSkipped: ['Lunch']
     },
     {
       id: 4,
@@ -86,9 +86,8 @@ const Mess = () => {
       lunch: 'Yes',
       dinner: 'No',
       roomNoBlock: 'A-205',
-      mealSkipped: 'Not Available',
-      messStatus: 'Available',
-      actions: 'active'
+      phoneNo: '+91 9876543213',
+      mealsSkipped: ['Dinner']
     },
     {
       id: 5,
@@ -97,9 +96,8 @@ const Mess = () => {
       lunch: 'No',
       dinner: 'Yes',
       roomNoBlock: 'B-102',
-      mealSkipped: 'Available',
-      messStatus: 'Available',
-      actions: 'active'
+      phoneNo: '+91 9876543214',
+      mealsSkipped: ['Breakfast', 'Lunch']
     },
     {
       id: 6,
@@ -108,9 +106,18 @@ const Mess = () => {
       lunch: 'Yes',
       dinner: 'Yes',
       roomNoBlock: 'C-204',
-      mealSkipped: 'Available',
-      messStatus: 'Available',
-      actions: 'active'
+      phoneNo: '+91 9876543215',
+      mealsSkipped: []
+    },
+    {
+      id: 7,
+      studentName: 'Arjun Nair',
+      breakfast: 'No',
+      lunch: 'No',
+      dinner: 'No',
+      roomNoBlock: 'A-303',
+      phoneNo: '+91 9876543216',
+      mealsSkipped: ['Breakfast', 'Lunch', 'Dinner']
     }
   ]);
 
@@ -138,10 +145,50 @@ const Mess = () => {
     document.getElementById(`file-input-${mealId}`).click();
   };
 
+  // Handle edit meal items
+  const handleEditMeal = (mealId) => {
+    setEditingMeal(mealId);
+  };
+
+  // Handle save meal items
+  const handleSaveMeal = (mealId, newItems) => {
+    setMeals(prev => prev.map(meal => 
+      meal.id === mealId 
+        ? { ...meal, items: newItems }
+        : meal
+    ));
+    setEditingMeal(null);
+  };
+
+  // Handle cancel edit
+  const handleCancelEdit = () => {
+    setEditingMeal(null);
+  };
+
+  // Handle edit time
+  const handleEditTime = (mealId) => {
+    setEditingTime(mealId);
+  };
+
+  // Handle save time
+  const handleSaveTime = (mealId, newTime) => {
+    setMeals(prev => prev.map(meal => 
+      meal.id === mealId 
+        ? { ...meal, time: newTime }
+        : meal
+    ));
+    setEditingTime(null);
+  };
+
+  // Handle cancel time edit
+  const handleCancelTimeEdit = () => {
+    setEditingTime(null);
+  };
+
   return (
     <div className="space-y-6">
       {/* Combined Skipped Stats and Meal Cards - 3 columns */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {meals.map((meal, index) => (
           <div key={index} className="space-y-4">
             {/* Skipped Meal Stat - positioned above each meal card */}
@@ -167,31 +214,40 @@ const Mess = () => {
               {/* Header */}
               <div className="p-6 border-b border-gray-200">
                 <h3 className="text-lg font-semibold text-gray-900">{meal.name}</h3>
-                <p className="text-sm text-gray-500">{meal.time}</p>
+                <div className="flex items-center justify-between mt-1">
+                  {editingTime === meal.id ? (
+                    <EditableTime
+                      time={meal.time}
+                      onSave={(newTime) => handleSaveTime(meal.id, newTime)}
+                      onCancel={handleCancelTimeEdit}
+                    />
+                  ) : (
+                    <>
+                      <p className="text-sm text-gray-500">{meal.time}</p>
+                      <button
+                        onClick={() => handleEditTime(meal.id)}
+                        className="text-blue-600 hover:text-blue-700"
+                      >
+                        <Edit2 className="w-4 h-4" />
+                      </button>
+                    </>
+                  )}
+                </div>
               </div>
 
               {/* Image Upload Area */}
               <div className="h-40 bg-gray-50 flex items-center justify-center border-b border-gray-200 relative">
-                {mealImages[meal.id] ? (
-                  <div className="relative w-full h-full">
-                    <img 
-                      src={mealImages[meal.id]} 
-                      alt={meal.name} 
-                      className="w-full h-full object-cover" 
-                    />
-                    <button
-                      onClick={() => setMealImages(prev => ({ ...prev, [meal.id]: null }))}
-                      className="absolute top-2 right-2 bg-red-500 text-white rounded-full p-2 hover:bg-red-600 transition-colors shadow-lg"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </button>
+                <div className="relative w-full h-full">
+                  <img 
+                    src={mealImages[meal.id]} 
+                    alt={meal.name} 
+                    className="w-full h-full object-cover cursor-pointer" 
+                    onClick={() => triggerFileInput(meal.id)}
+                  />
+                  <div className="absolute inset-0 bg-black bg-opacity-0 hover:bg-opacity-20 transition-all duration-200 flex items-center justify-center cursor-pointer" onClick={() => triggerFileInput(meal.id)}>
+                    <Camera className="w-8 h-8 text-white opacity-0 hover:opacity-100 transition-opacity duration-200" />
                   </div>
-                ) : (
-                  <div className="text-center cursor-pointer p-4" onClick={() => triggerFileInput(meal.id)}>
-                    <Camera className="w-10 h-10 text-gray-400 mx-auto mb-2" />
-                    <p className="text-gray-500 text-sm">Upload meal image</p>
-                  </div>
-                )}
+                </div>
                 
                 {/* Hidden file input */}
                 <input
@@ -205,24 +261,35 @@ const Mess = () => {
               
               {/* Food Items List */}
               <div className="p-6">
-                <h4 className="text-sm font-medium text-gray-700 mb-3">Menu Items:</h4>
-                <ul className="space-y-2 mb-4">
-                  {meal.items.map((item, itemIndex) => (
-                    <li key={itemIndex} className="flex items-center space-x-2 text-sm text-gray-600">
-                      <div className="w-2 h-2 bg-blue-500 rounded-full flex-shrink-0"></div>
-                      <span>{item}</span>
-                    </li>
-                  ))}
-                </ul>
-                
-                {/* Upload Menu Button */}
-                <button 
-                  onClick={() => triggerFileInput(meal.id)}
-                  className="w-full flex items-center justify-center space-x-2 px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
-                >
-                  <Upload className="w-4 h-4" />
-                  <span>Upload Menu</span>
-                </button>
+                <div className="flex items-center justify-between mb-3">
+                  <h4 className="text-sm font-medium text-gray-700">Menu Items:</h4>
+                  {editingMeal !== meal.id && (
+                    <button
+                      onClick={() => handleEditMeal(meal.id)}
+                      className="flex items-center space-x-1 text-blue-600 hover:text-blue-700 transition-colors"
+                    >
+                      <Edit2 className="w-4 h-4" />
+                      <span className="text-sm">Edit</span>
+                    </button>
+                  )}
+                </div>
+
+                {editingMeal === meal.id ? (
+                  <EditableMenuItems
+                    items={meal.items}
+                    onSave={(newItems) => handleSaveMeal(meal.id, newItems)}
+                    onCancel={handleCancelEdit}
+                  />
+                ) : (
+                  <ul className="space-y-2">
+                    {meal.items.map((item, itemIndex) => (
+                      <li key={itemIndex} className="flex items-center space-x-2 text-sm text-gray-600">
+                        <div className="w-2 h-2 bg-blue-500 rounded-full flex-shrink-0"></div>
+                        <span>{item}</span>
+                      </li>
+                    ))}
+                  </ul>
+                )}
               </div>
             </div>
           </div>
@@ -264,22 +331,13 @@ const Mess = () => {
                   Student Name
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Breakfast
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Lunch
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Dinner
+                  Meals Skipped
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Room No/Block
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Mess Status
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Actions
+                  Phone No
                 </th>
               </tr>
             </thead>
@@ -297,59 +355,139 @@ const Mess = () => {
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <span className={`px-3 py-1 rounded-full text-xs font-medium ${
-                      student.breakfast === 'Yes' 
-                        ? 'bg-green-100 text-green-800' 
-                        : 'bg-red-100 text-red-800'
-                    }`}>
-                      {student.breakfast}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <span className={`px-3 py-1 rounded-full text-xs font-medium ${
-                      student.lunch === 'Yes' 
-                        ? 'bg-green-100 text-green-800' 
-                        : 'bg-red-100 text-red-800'
-                    }`}>
-                      {student.lunch}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <span className={`px-3 py-1 rounded-full text-xs font-medium ${
-                      student.dinner === 'Yes' 
-                        ? 'bg-green-100 text-green-800' 
-                        : 'bg-red-100 text-red-800'
-                    }`}>
-                      {student.dinner}
-                    </span>
+                    <div className="flex flex-wrap gap-1">
+                      {student.mealsSkipped.length === 0 ? (
+                        <span className="px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                          None
+                        </span>
+                      ) : (
+                        student.mealsSkipped.map((meal, index) => (
+                          <span 
+                            key={index}
+                            className="px-3 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800"
+                          >
+                            {meal}
+                          </span>
+                        ))
+                      )}
+                    </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                     {student.roomNoBlock}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <span className={`px-3 py-1 rounded-full text-xs font-medium ${
-                      student.messStatus === 'Available' 
-                        ? 'bg-green-100 text-green-800' 
-                        : 'bg-red-100 text-red-800'
-                    }`}>
-                      {student.messStatus}
-                    </span>
-                  </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    <div className="flex items-center space-x-3">
-                      <button className="text-blue-600 hover:text-blue-800 font-medium">
-                        View More
-                      </button>
-                      <button className="text-red-600 hover:text-red-800">
-                        <Trash2 className="w-4 h-4" />
-                      </button>
-                    </div>
+                    {student.phoneNo}
                   </td>
                 </tr>
               ))}
             </tbody>
           </table>
         </div>
+      </div>
+    </div>
+  );
+};
+
+// Editable Time Component
+const EditableTime = ({ time, onSave, onCancel }) => {
+  const [editableTime, setEditableTime] = useState(time);
+
+  const handleSave = () => {
+    onSave(editableTime);
+  };
+
+  return (
+    <div className="flex items-center space-x-2">
+      <input
+        type="text"
+        value={editableTime}
+        onChange={(e) => setEditableTime(e.target.value)}
+        className="text-sm border border-gray-300 rounded px-2 py-1 focus:outline-none focus:ring-1 focus:ring-blue-500 w-32"
+        placeholder="e.g. 7:00 AM - 9:00 AM"
+      />
+      <button
+        onClick={handleSave}
+        className="text-green-600 hover:text-green-700"
+      >
+        <Save className="w-4 h-4" />
+      </button>
+      <button
+        onClick={onCancel}
+        className="text-gray-500 hover:text-gray-700"
+      >
+        <X className="w-4 h-4" />
+      </button>
+    </div>
+  );
+};
+
+// Editable Menu Items Component
+const EditableMenuItems = ({ items, onSave, onCancel }) => {
+  const [editableItems, setEditableItems] = useState([...items]);
+
+  const handleItemChange = (index, value) => {
+    const newItems = [...editableItems];
+    newItems[index] = value;
+    setEditableItems(newItems);
+  };
+
+  const handleAddItem = () => {
+    setEditableItems([...editableItems, '']);
+  };
+
+  const handleRemoveItem = (index) => {
+    const newItems = editableItems.filter((_, i) => i !== index);
+    setEditableItems(newItems);
+  };
+
+  const handleSave = () => {
+    const filteredItems = editableItems.filter(item => item.trim() !== '');
+    onSave(filteredItems);
+  };
+
+  return (
+    <div className="space-y-3">
+      {editableItems.map((item, index) => (
+        <div key={index} className="flex items-center space-x-2">
+          <div className="w-2 h-2 bg-blue-500 rounded-full flex-shrink-0"></div>
+          <input
+            type="text"
+            value={item}
+            onChange={(e) => handleItemChange(index, e.target.value)}
+            className="flex-1 text-sm border border-gray-300 rounded px-2 py-1 focus:outline-none focus:ring-1 focus:ring-blue-500"
+            placeholder="Enter menu item..."
+          />
+          <button
+            onClick={() => handleRemoveItem(index)}
+            className="text-red-500 hover:text-red-700"
+          >
+            <X className="w-4 h-4" />
+          </button>
+        </div>
+      ))}
+      
+      <button
+        onClick={handleAddItem}
+        className="text-blue-600 hover:text-blue-700 text-sm font-medium"
+      >
+        + Add Item
+      </button>
+      
+      <div className="flex items-center space-x-2 pt-2">
+        <button
+          onClick={handleSave}
+          className="flex items-center space-x-1 px-3 py-1 bg-green-600 text-white rounded hover:bg-green-700 transition-colors"
+        >
+          <Save className="w-4 h-4" />
+          <span className="text-sm">Save</span>
+        </button>
+        <button
+          onClick={onCancel}
+          className="flex items-center space-x-1 px-3 py-1 bg-gray-500 text-white rounded hover:bg-gray-600 transition-colors"
+        >
+          <X className="w-4 h-4" />
+          <span className="text-sm">Cancel</span>
+        </button>
       </div>
     </div>
   );
