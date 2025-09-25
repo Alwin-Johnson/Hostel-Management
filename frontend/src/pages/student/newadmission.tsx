@@ -6,7 +6,6 @@ import { Label } from '../../components/student/label';
 import { Card, CardContent, CardHeader, CardTitle } from '../../components/student/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../components/student/select';
 import { Textarea } from '../../components/student/textarea';
-import { ArrowLeft, GraduationCap } from 'lucide-react';
 import { toast } from 'sonner';
 
 interface NewAdmissionProps {
@@ -15,300 +14,414 @@ interface NewAdmissionProps {
 
 export const NewAdmission: React.FC<NewAdmissionProps> = ({ onPageChange }) => {
   const [applicationData, setApplicationData] = useState({
-    firstName: '',
-    lastName: '',
-    email: '',
-    phone: '',
-    dateOfBirth: '',
-    gender: '',
-    course: '',
-    year: '',
-    rollNumber: '',
-    fatherName: '',
-    motherName: '',
-    guardianPhone: '',
-    emergencyContact: '',
-    address: '',
-    city: '',
-    state: '',
-    pincode: '',
-    roomPreference: '',
-    messType: '',
-    medicalInfo: '',
-    previousHostel: ''
+    name: '', email: '', phone: '', dateOfBirth: '', gender: '', course: '', stream: '', year: '',
+    collegeAdmissionNo: '', parentName: '', parentPhone: '', guardianName: '', guardianPhone: '',
+    address: '', roomPreference: '', messType: ''
   });
 
-  const handleApplicationSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (applicationData.firstName && applicationData.email && applicationData.phone) {
-      toast.success('Application submitted successfully! We will inform you soon about your status.');
-      setTimeout(() => onPageChange && onPageChange('landing'), 2000);
-    } else {
-      toast.error('Please fill in all required fields');
+  const [errors, setErrors] = useState<{ [key: string]: string }>({});
+
+  // Validation functions
+  const validateName = (name: string): string => {
+    const nameRegex = /^[a-zA-Z\s]+$/;
+    if (!name.trim()) return 'This field is required';
+    if (!nameRegex.test(name)) return 'Should contain only alphabets';
+    if (name.trim().length < 2) return 'Should be at least 2 characters';
+    return '';
+  };
+
+  const validateEmail = (email: string): string => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!email.trim()) return 'Email is required';
+    if (!emailRegex.test(email)) return 'Please enter a valid email address';
+    return '';
+  };
+
+  const validatePhone = (phone: string): string => {
+    const phoneRegex = /^[0-9]{10}$/;
+    if (!phone.trim()) return 'Phone number is required';
+    if (!phoneRegex.test(phone.replace(/\s+/g, ''))) return 'Phone number must be exactly 10 digits';
+    return '';
+  };
+
+  const validateRequired = (value: string, fieldName: string): string => {
+    if (!value || !value.trim()) return `${fieldName} is required`;
+    return '';
+  };
+
+  const validateAddress = (address: string): string => {
+    if (!address.trim()) return 'Address is required';
+    if (address.trim().length < 10) return 'Address should be at least 10 characters';
+    return '';
+  };
+
+  const validateCollegeNo = (collegeNo: string): string => {
+    if (!collegeNo.trim()) return 'College admission number is required';
+    if (!/^[a-zA-Z0-9]+$/.test(collegeNo)) return 'Should contain only letters and numbers';
+    return '';
+  };
+
+  const validateDateOfBirth = (date: string): string => {
+    if (!date.trim()) return 'Date of birth is required';
+    const selectedDate = new Date(date);
+    const today = new Date();
+    const monthDiff = today.getMonth() - selectedDate.getMonth();
+    let age = today.getFullYear() - selectedDate.getFullYear();
+    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < selectedDate.getDate())) {
+      age--;
+    }
+    if (age < 15 || age > 30) return 'Age should be between 15-30 years';
+    return '';
+  };
+
+  const validateForm = (): boolean => {
+    const newErrors: { [key: string]: string } = {};
+    
+    // All fields are now required
+    newErrors.name = validateName(applicationData.name);
+    newErrors.email = validateEmail(applicationData.email);
+    newErrors.phone = validatePhone(applicationData.phone);
+    newErrors.dateOfBirth = validateDateOfBirth(applicationData.dateOfBirth);
+    newErrors.gender = validateRequired(applicationData.gender, 'Gender');
+    newErrors.course = validateRequired(applicationData.course, 'Course');
+    newErrors.stream = validateRequired(applicationData.stream, 'Stream');
+    newErrors.year = validateRequired(applicationData.year, 'Academic Year');
+    newErrors.collegeAdmissionNo = validateCollegeNo(applicationData.collegeAdmissionNo);
+    newErrors.parentName = validateName(applicationData.parentName);
+    newErrors.parentPhone = validatePhone(applicationData.parentPhone);
+    newErrors.guardianName = validateName(applicationData.guardianName);
+    newErrors.guardianPhone = validatePhone(applicationData.guardianPhone);
+    newErrors.address = validateAddress(applicationData.address);
+    newErrors.roomPreference = validateRequired(applicationData.roomPreference, 'Room Preference');
+    newErrors.messType = validateRequired(applicationData.messType, 'Mess Type');
+
+    setErrors(newErrors);
+    return Object.values(newErrors).every(error => !error);
+  };
+
+  const handleInputChange = (field: string, value: string): void => {
+    setApplicationData({ ...applicationData, [field]: value });
+    if (errors[field]) {
+      setErrors({ ...errors, [field]: '' });
     }
   };
 
-  return (
+  const handleApplicationSubmit = (e: React.FormEvent): void => {
+    e.preventDefault();
     
+    if (!validateForm()) {
+      toast.error('Please fill all required fields correctly');
+      return;
+    }
 
-      <div className="max-w-4xl mx-auto py-10 px-6">
-        <Card className="bg-white/95 backdrop-blur-lg shadow-xl border border-gray-100 rounded-3xl">
-          <CardHeader className="text-center pb-6">
+    console.log('Application Data:', applicationData);
+    toast.success('Application submitted successfully! We will inform you soon about your status.');
+    setTimeout(() => onPageChange && onPageChange('landing'), 2000);
+  };
+
+  const inputClass = (field: string): string => 
+    `h-12 rounded-xl transition-all duration-300 hover:shadow-lg focus:scale-105 ${
+      errors[field] ? 'border-red-500 focus:ring-red-500' : ''
+    }`;
+
+  const ErrorText: React.FC<{ field: string }> = ({ field }) => 
+    errors[field] ? <p className="text-red-500 text-sm mt-1">{errors[field]}</p> : null;
+
+  return (
+    <>
+      <style>
+        {`
+          @keyframes slideIn {
+            0% { transform: translateY(30px); opacity: 0; }
+            100% { transform: translateY(0); opacity: 1; }
+          }
+          @keyframes pulse-glow {
+            0%, 100% { box-shadow: 0 0 20px rgba(59, 130, 246, 0.3); }
+            50% { box-shadow: 0 0 30px rgba(59, 130, 246, 0.5); }
+          }
+          .animate-slide-in { animation: slideIn 0.8s ease-out forwards; }
+          .animate-pulse-glow { animation: pulse-glow 3s ease-in-out infinite; }
+        `}
+      </style>
+
+      <div className="max-w-4xl mx-auto px-6 min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
+        <Card className="bg-white shadow-xl rounded-3xl animate-slide-in relative z-10">
+          
+          <CardHeader className="text-center pb-4">
             <CardTitle className="text-3xl font-bold text-gray-900">New Admission Application</CardTitle>
             <p className="text-gray-600 text-lg">Fill out the form below to apply for hostel admission</p>
           </CardHeader>
+          
           <CardContent className="p-8">
-            <form onSubmit={handleApplicationSubmit} className="space-y-8">
-              
+            <form onSubmit={handleApplicationSubmit} className="space-y-6">
+
               {/* Personal Information */}
-              <div className="space-y-4">
-                <h4 className="text-lg border-b pb-2">Personal Information</h4>
+              <div className="space-y-4 animate-slide-in" style={{ animationDelay: '0.2s' }}>
+                <div className="flex items-center border-b pb-3">
+                  <div className="w-2 h-6 bg-blue-600 rounded mr-2 animate-pulse-glow"></div>
+                  <h4 className="text-xl font-semibold text-gray-800">Personal Information</h4>
+                </div>
+                
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="firstName">First Name *</Label>
+                  <div className="space-y-1">
+                    <Label htmlFor="name">Full Name *</Label>
                     <Input
-                      id="firstName"
-                      type="text"
-                      placeholder="Enter first name"
-                      value={applicationData.firstName}
-                      onChange={(e) => setApplicationData({ ...applicationData, firstName: e.target.value })}
-                      required
+                      id="name" type="text" placeholder="Enter full name"
+                      value={applicationData.name}
+                      onChange={(e) => handleInputChange('name', e.target.value)}
+                      className={inputClass('name')} required
                     />
+                    <ErrorText field="name" />
                   </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="lastName">Last Name *</Label>
-                    <Input
-                      id="lastName"
-                      type="text"
-                      placeholder="Enter last name"
-                      value={applicationData.lastName}
-                      onChange={(e) => setApplicationData({ ...applicationData, lastName: e.target.value })}
-                      required
-                    />
-                  </div>
-                  <div className="space-y-2">
+
+                  <div className="space-y-1">
                     <Label htmlFor="email">Email *</Label>
                     <Input
-                      id="email"
-                      type="email"
-                      placeholder="student@example.com"
+                      id="email" type="email" placeholder="student@example.com"
                       value={applicationData.email}
-                      onChange={(e) => setApplicationData({ ...applicationData, email: e.target.value })}
-                      required
+                      onChange={(e) => handleInputChange('email', e.target.value)}
+                      className={inputClass('email')} required
                     />
+                    <ErrorText field="email" />
                   </div>
-                  <div className="space-y-2">
+
+                  <div className="space-y-1">
                     <Label htmlFor="phone">Phone *</Label>
                     <Input
-                      id="phone"
-                      type="tel"
-                      placeholder="+91 9876543210"
+                      id="phone" type="tel" placeholder="9876543210" maxLength={10}
                       value={applicationData.phone}
-                      onChange={(e) => setApplicationData({ ...applicationData, phone: e.target.value })}
-                      required
+                      onChange={(e) => {
+                        const value = e.target.value.replace(/\D/g, '');
+                        handleInputChange('phone', value);
+                      }}
+                      className={inputClass('phone')} required
                     />
+                    <ErrorText field="phone" />
                   </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="dob">Date of Birth</Label>
+
+                  <div className="space-y-1">
+                    <Label htmlFor="dob">Date of Birth *</Label>
                     <Input
-                      id="dob"
-                      type="date"
+                      id="dob" type="date"
                       value={applicationData.dateOfBirth}
-                      onChange={(e) => setApplicationData({ ...applicationData, dateOfBirth: e.target.value })}
+                      onChange={(e) => handleInputChange('dateOfBirth', e.target.value)}
+                      className={inputClass('dateOfBirth')} required
                     />
+                    <ErrorText field="dateOfBirth" />
                   </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="gender">Gender</Label>
-                    <Select onValueChange={(value) => setApplicationData({ ...applicationData, gender: value })}>
-                      <SelectTrigger>
+
+                  <div className="space-y-1">
+                    <Label htmlFor="gender">Gender *</Label>
+                    <Select onValueChange={(value) => handleInputChange('gender', value)}>
+                      <SelectTrigger className={inputClass('gender')}>
                         <SelectValue placeholder="Select gender" />
                       </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="male">Male</SelectItem>
-                        <SelectItem value="female">Female</SelectItem>
-                        <SelectItem value="other">Other</SelectItem>
+                      <SelectContent className="bg-white border border-gray-200 shadow-lg">
+                        <SelectItem value="male" className="text-gray-900 hover:bg-gray-100 focus:bg-gray-100">Male</SelectItem>
+                        <SelectItem value="female" className="text-gray-900 hover:bg-gray-100 focus:bg-gray-100">Female</SelectItem>
+                        <SelectItem value="other" className="text-gray-900 hover:bg-gray-100 focus:bg-gray-100">Other</SelectItem>
                       </SelectContent>
                     </Select>
+                    <ErrorText field="gender" />
                   </div>
                 </div>
               </div>
 
               {/* Academic Information */}
-              <div className="space-y-4">
-                <h4 className="text-lg border-b pb-2">Academic Information</h4>
+              <div className="space-y-4 animate-slide-in" style={{ animationDelay: '0.4s' }}>
+                <div className="flex items-center border-b pb-3">
+                  <div className="w-2 h-6 bg-green-600 rounded mr-2 animate-pulse-glow"></div>
+                  <h4 className="text-xl font-semibold text-gray-800">Academic Information</h4>
+                </div>
+                
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="course">Course/Program</Label>
-                    <Select onValueChange={(value) => setApplicationData({ ...applicationData, course: value })}>
-                      <SelectTrigger>
+                  <div className="space-y-1">
+                    <Label htmlFor="course">Course *</Label>
+                    <Select onValueChange={(value) => handleInputChange('course', value)}>
+                      <SelectTrigger className={inputClass('course')}>
                         <SelectValue placeholder="Select course" />
                       </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="btech">B.Tech</SelectItem>
-                        <SelectItem value="mtech">M.Tech</SelectItem>
-                        <SelectItem value="bba">BBA</SelectItem>
-                        <SelectItem value="mba">MBA</SelectItem>
-                        <SelectItem value="bca">BCA</SelectItem>
-                        <SelectItem value="mca">MCA</SelectItem>
+                      <SelectContent className="bg-white border border-gray-200 shadow-lg">
+                        <SelectItem value="btech" className="text-gray-900 hover:bg-gray-100 focus:bg-gray-100">B.Tech</SelectItem>
+                        <SelectItem value="mtech" className="text-gray-900 hover:bg-gray-100 focus:bg-gray-100">M.Tech</SelectItem>
                       </SelectContent>
                     </Select>
+                    <ErrorText field="course" />
                   </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="year">Academic Year</Label>
-                    <Select onValueChange={(value) => setApplicationData({ ...applicationData, year: value })}>
-                      <SelectTrigger>
+
+                  <div className="space-y-1">
+                    <Label htmlFor="stream">Stream *</Label>
+                    <Select onValueChange={(value) => handleInputChange('stream', value)}>
+                      <SelectTrigger className={inputClass('stream')}>
+                        <SelectValue placeholder="Select stream" />
+                      </SelectTrigger>
+                      <SelectContent className="bg-white border border-gray-200 shadow-lg">
+                        <SelectItem value="cse" className="text-gray-900 hover:bg-gray-100 focus:bg-gray-100">CSE</SelectItem>
+                        <SelectItem value="ece" className="text-gray-900 hover:bg-gray-100 focus:bg-gray-100">ECE</SelectItem>
+                        <SelectItem value="me" className="text-gray-900 hover:bg-gray-100 focus:bg-gray-100">Mechanical</SelectItem>
+                        <SelectItem value="ce" className="text-gray-900 hover:bg-gray-100 focus:bg-gray-100">Civil</SelectItem>
+                        <SelectItem value="ee" className="text-gray-900 hover:bg-gray-100 focus:bg-gray-100">Electrical</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <ErrorText field="stream" />
+                  </div>
+
+                  <div className="space-y-1">
+                    <Label htmlFor="year">Academic Year *</Label>
+                    <Select onValueChange={(value) => handleInputChange('year', value)}>
+                      <SelectTrigger className={inputClass('year')}>
                         <SelectValue placeholder="Select year" />
                       </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="1">First Year</SelectItem>
-                        <SelectItem value="2">Second Year</SelectItem>
-                        <SelectItem value="3">Third Year</SelectItem>
-                        <SelectItem value="4">Fourth Year</SelectItem>
+                      <SelectContent className="bg-white border border-gray-200 shadow-lg">
+                        <SelectItem value="1" className="text-gray-900 hover:bg-gray-100 focus:bg-gray-100">First Year</SelectItem>
+                        <SelectItem value="2" className="text-gray-900 hover:bg-gray-100 focus:bg-gray-100">Second Year</SelectItem>
+                        <SelectItem value="3" className="text-gray-900 hover:bg-gray-100 focus:bg-gray-100">Third Year</SelectItem>
+                        <SelectItem value="4" className="text-gray-900 hover:bg-gray-100 focus:bg-gray-100">Fourth Year</SelectItem>
                       </SelectContent>
                     </Select>
+                    <ErrorText field="year" />
                   </div>
-                  <div className="space-y-2 md:col-span-2">
-                    <Label htmlFor="rollNumber">Roll Number (if available)</Label>
+
+                  <div className="space-y-1">
+                    <Label htmlFor="collegeAdmissionNo">College Admission No *</Label>
                     <Input
-                      id="rollNumber"
-                      type="text"
-                      placeholder="Enter roll number"
-                      value={applicationData.rollNumber}
-                      onChange={(e) => setApplicationData({ ...applicationData, rollNumber: e.target.value })}
+                      id="collegeAdmissionNo" type="text" placeholder="Enter college admission no"
+                      value={applicationData.collegeAdmissionNo}
+                      onChange={(e) => handleInputChange('collegeAdmissionNo', e.target.value)}
+                      className={inputClass('collegeAdmissionNo')} required
                     />
+                    <ErrorText field="collegeAdmissionNo" />
                   </div>
                 </div>
               </div>
 
               {/* Family Information */}
-              <div className="space-y-4">
-                <h4 className="text-lg border-b pb-2">Family Information</h4>
+              <div className="space-y-4 animate-slide-in" style={{ animationDelay: '0.6s' }}>
+                <div className="flex items-center border-b pb-3">
+                  <div className="w-2 h-6 bg-purple-600 rounded mr-2 animate-pulse-glow"></div>
+                  <h4 className="text-xl font-semibold text-gray-800">Family Information</h4>
+                </div>
+                
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="fatherName">Father's Name</Label>
+                  <div className="space-y-1">
+                    <Label htmlFor="parentName">Parent Name *</Label>
                     <Input
-                      id="fatherName"
-                      type="text"
-                      placeholder="Enter father's name"
-                      value={applicationData.fatherName}
-                      onChange={(e) => setApplicationData({ ...applicationData, fatherName: e.target.value })}
+                      id="parentName" type="text" placeholder="Enter parent name"
+                      value={applicationData.parentName}
+                      onChange={(e) => handleInputChange('parentName', e.target.value)}
+                      className={inputClass('parentName')} required
                     />
+                    <ErrorText field="parentName" />
                   </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="motherName">Mother's Name</Label>
+
+                  <div className="space-y-1">
+                    <Label htmlFor="parentPhone">Parent Phone *</Label>
                     <Input
-                      id="motherName"
-                      type="text"
-                      placeholder="Enter mother's name"
-                      value={applicationData.motherName}
-                      onChange={(e) => setApplicationData({ ...applicationData, motherName: e.target.value })}
+                      id="parentPhone" type="tel" placeholder="9876543210" maxLength={10}
+                      value={applicationData.parentPhone}
+                      onChange={(e) => {
+                        const value = e.target.value.replace(/\D/g, '');
+                        handleInputChange('parentPhone', value);
+                      }}
+                      className={inputClass('parentPhone')} required
                     />
+                    <ErrorText field="parentPhone" />
                   </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="guardianPhone">Guardian Phone</Label>
+
+                  <div className="space-y-1">
+                    <Label htmlFor="guardianName">Local Guardian Name *</Label>
                     <Input
-                      id="guardianPhone"
-                      type="tel"
-                      placeholder="+91 9876543210"
+                      id="guardianName" type="text" placeholder="Enter local guardian name"
+                      value={applicationData.guardianName}
+                      onChange={(e) => handleInputChange('guardianName', e.target.value)}
+                      className={inputClass('guardianName')} required
+                    />
+                    <ErrorText field="guardianName" />
+                  </div>
+
+                  <div className="space-y-1">
+                    <Label htmlFor="guardianPhone">Local Guardian Phone *</Label>
+                    <Input
+                      id="guardianPhone" type="tel" placeholder="9876543210" maxLength={10}
                       value={applicationData.guardianPhone}
-                      onChange={(e) => setApplicationData({ ...applicationData, guardianPhone: e.target.value })}
+                      onChange={(e) => {
+                        const value = e.target.value.replace(/\D/g, '');
+                        handleInputChange('guardianPhone', value);
+                      }}
+                      className={inputClass('guardianPhone')} required
                     />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="emergencyContact">Emergency Contact</Label>
-                    <Input
-                      id="emergencyContact"
-                      type="tel"
-                      placeholder="+91 9876543210"
-                      value={applicationData.emergencyContact}
-                      onChange={(e) => setApplicationData({ ...applicationData, emergencyContact: e.target.value })}
-                    />
+                    <ErrorText field="guardianPhone" />
                   </div>
                 </div>
               </div>
 
-              {/* Address Information */}
-              <div className="space-y-4">
-                <h4 className="text-lg border-b pb-2">Address Information</h4>
-                <Textarea
-                  id="address"
-                  placeholder="Enter complete address"
-                  value={applicationData.address}
-                  onChange={(e) => setApplicationData({ ...applicationData, address: e.target.value })}
-                />
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <Input
-                    id="city"
-                    type="text"
-                    placeholder="City"
-                    value={applicationData.city}
-                    onChange={(e) => setApplicationData({ ...applicationData, city: e.target.value })}
+              {/* Address */}
+              <div className="space-y-4 animate-slide-in" style={{ animationDelay: '0.8s' }}>
+                <div className="flex items-center border-b pb-3">
+                  <div className="w-2 h-6 bg-orange-600 rounded mr-2 animate-pulse-glow"></div>
+                  <h4 className="text-xl font-semibold text-gray-800">Address</h4>
+                </div>
+                
+                <div className="space-y-1">
+                  <Label htmlFor="address">Full Address *</Label>
+                  <Textarea
+                    id="address" placeholder="Enter full address (minimum 10 characters)"
+                    value={applicationData.address}
+                    onChange={(e) => handleInputChange('address', e.target.value)}
+                    className={`rounded-xl transition-all duration-300 hover:shadow-lg focus:scale-105 ${
+                      errors.address ? 'border-red-500 focus:ring-red-500' : ''
+                    }`} required
                   />
-                  <Input
-                    id="state"
-                    type="text"
-                    placeholder="State"
-                    value={applicationData.state}
-                    onChange={(e) => setApplicationData({ ...applicationData, state: e.target.value })}
-                  />
-                  <Input
-                    id="pincode"
-                    type="text"
-                    placeholder="Pincode"
-                    value={applicationData.pincode}
-                    onChange={(e) => setApplicationData({ ...applicationData, pincode: e.target.value })}
-                  />
+                  <ErrorText field="address" />
                 </div>
               </div>
 
               {/* Hostel Preferences */}
-              <div className="space-y-4">
-                <h4 className="text-lg border-b pb-2">Hostel Preferences</h4>
+              <div className="space-y-4 animate-slide-in" style={{ animationDelay: '1s' }}>
+                <div className="flex items-center border-b pb-3">
+                  <div className="w-2 h-6 bg-teal-600 rounded mr-2 animate-pulse-glow"></div>
+                  <h4 className="text-xl font-semibold text-gray-800">Hostel Preferences</h4>
+                </div>
+                
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="roomPreference">Room Preference</Label>
-                    <Select onValueChange={(value) => setApplicationData({ ...applicationData, roomPreference: value })}>
-                      <SelectTrigger>
+                  <div className="space-y-1">
+                    <Label htmlFor="roomPreference">Room Preference *</Label>
+                    <Select onValueChange={(value) => handleInputChange('roomPreference', value)}>
+                      <SelectTrigger className={inputClass('roomPreference')}>
                         <SelectValue placeholder="Select room type" />
                       </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="single">Single Room</SelectItem>
-                        <SelectItem value="double">Double Sharing</SelectItem>
-                        <SelectItem value="triple">Triple Sharing</SelectItem>
-                        <SelectItem value="four">Four Sharing</SelectItem>
+                      <SelectContent className="bg-white border border-gray-200 shadow-lg">
+                        <SelectItem value="single" className="text-gray-900 hover:bg-gray-100 focus:bg-gray-100">Single Room</SelectItem>
+                        <SelectItem value="double" className="text-gray-900 hover:bg-gray-100 focus:bg-gray-100">Double Sharing</SelectItem>
+                        <SelectItem value="triple" className="text-gray-900 hover:bg-gray-100 focus:bg-gray-100">Triple Sharing</SelectItem>
+                        <SelectItem value="four" className="text-gray-900 hover:bg-gray-100 focus:bg-gray-100">Four Sharing</SelectItem>
                       </SelectContent>
                     </Select>
+                    <ErrorText field="roomPreference" />
                   </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="messType">Mess Type Preference</Label>
-                    <Select onValueChange={(value) => setApplicationData({ ...applicationData, messType: value })}>
-                      <SelectTrigger>
+                  
+                  <div className="space-y-1">
+                    <Label htmlFor="messType">Mess Type Preference *</Label>
+                    <Select onValueChange={(value) => handleInputChange('messType', value)}>
+                      <SelectTrigger className={inputClass('messType')}>
                         <SelectValue placeholder="Select mess type" />
                       </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="veg">Vegetarian</SelectItem>
-                        <SelectItem value="nonveg">Non-Vegetarian</SelectItem>
-                        <SelectItem value="mixed">Mixed</SelectItem>
+                      <SelectContent className="bg-white border border-gray-200 shadow-lg">
+                        <SelectItem value="veg" className="text-gray-900 hover:bg-gray-100 focus:bg-gray-100">Vegetarian</SelectItem>
+                        <SelectItem value="nonveg" className="text-gray-900 hover:bg-gray-100 focus:bg-gray-100">Non-Vegetarian</SelectItem>
+                        <SelectItem value="mixed" className="text-gray-900 hover:bg-gray-100 focus:bg-gray-100">Mixed</SelectItem>
                       </SelectContent>
                     </Select>
+                    <ErrorText field="messType" />
                   </div>
                 </div>
-                <Textarea
-                  id="medicalInfo"
-                  placeholder="Medical Info (Optional)"
-                  value={applicationData.medicalInfo}
-                  onChange={(e) => setApplicationData({ ...applicationData, medicalInfo: e.target.value })}
-                />
-                <Textarea
-                  id="previousHostel"
-                  placeholder="Previous Hostel Experience (Optional)"
-                  value={applicationData.previousHostel}
-                  onChange={(e) => setApplicationData({ ...applicationData, previousHostel: e.target.value })}
-                />
               </div>
 
-              <div className="flex justify-center pt-6">
-                <Button type="submit" className="w-full max-w-md h-12 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300">
+              <div className="flex justify-center pt-4 animate-slide-in" style={{ animationDelay: '1.2s' }}>
+                <Button 
+                  type="submit" 
+                  className="w-full max-w-md h-12 bg-blue-600 hover:bg-blue-700 text-white rounded-xl shadow-lg transition-all duration-300 hover:scale-105 hover:shadow-xl animate-pulse-glow"
+                >
                   Submit Application
                 </Button>
               </div>
@@ -317,5 +430,6 @@ export const NewAdmission: React.FC<NewAdmissionProps> = ({ onPageChange }) => {
           </CardContent>
         </Card>
       </div>
+    </>
   );
 };

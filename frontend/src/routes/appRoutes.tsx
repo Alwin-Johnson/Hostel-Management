@@ -2,6 +2,10 @@
 import React, { useState } from 'react';
 import { Routes, Route, Navigate, useNavigate } from 'react-router-dom';
 
+// Add this import with your other admin imports
+import Complaints from '../pages/admin/complaint';
+
+
 // ----------------------
 // Admin Pages & Layout
 // ----------------------
@@ -234,16 +238,18 @@ const AppRoutes: React.FC = () => {
         }
       />
       
-      <Route
-        path="/admin/complaints"
-        element={
-          <ProtectedRoute isAuthenticated={isAdminAuthenticated}>
-            <AdminLayout pageTitle="Complaints" onLogout={handleAdminLogout}>
-              <div>Complaints Content Coming Soon...</div>
-            </AdminLayout>
-          </ProtectedRoute>
-        }
-      />
+     // Then replace the complaints route with this:
+<Route
+  path="/admin/complaint"
+  element={
+    <ProtectedRoute isAuthenticated={isAdminAuthenticated}>
+      <AdminLayout pageTitle="Notice & Complaints" onLogout={handleAdminLogout}>
+        <Complaints />
+      </AdminLayout>
+    </ProtectedRoute>
+  }
+/>
+      
 
       {/* Catch-all */}
       <Route path="*" element={<Navigate to="/" replace />} />

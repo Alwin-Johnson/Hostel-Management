@@ -135,7 +135,7 @@ const LineChartCard: React.FC<LineChartCardProps> = ({ title }) => {
         </div>
       </div>
       
-      <div className="h-64">
+      <div className="h-80">
         <ResponsiveContainer width="100%" height="100%">
           <LineChart data={mealData[selectedMeal as keyof typeof mealData]}>
             <CartesianGrid strokeDasharray="3 3" />
@@ -263,50 +263,24 @@ const Dashboard: React.FC = () => {
         ))}
       </div>
 
-      {/* Main Content Grid */}
+      {/* Main Content Grid - Chart in center */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 mb-8">
-        {/* Line Chart - Takes up 8 columns on large screens */}
-        <div className="lg:col-span-8">
+        {/* Line Chart - Takes up 8 columns on large screens and centered */}
+        <div className="lg:col-span-8 lg:col-start-3">
           <LineChartCard title="Skipped Meals Trends" />
-        </div>
-
-        {/* Recent Admissions - Takes up 4 columns on large screens */}
-        <div className="lg:col-span-4">
-          <ListCard title="Recent Admissions" items={recentAdmissions} />
         </div>
       </div>
 
       {/* Bottom Section */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-        {/* Recent Complaints */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+        {/* Recent Admissions - Left side */}
         <div>
-          <ListCard title="Recent Complaints" items={recentComplaints} />
+          <ListCard title="Recent Admissions" items={recentAdmissions} />
         </div>
 
-        {/* Additional Stats or Info Card */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">Quick Stats</h3>
-          <div className="grid grid-cols-2 gap-4">
-            <div className="text-center p-3 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors cursor-pointer">
-              <p className="text-2xl font-bold text-blue-600">98%</p>
-              <p className="text-sm text-gray-600">Attendance Rate</p>
-            </div>
-            <div className="text-center p-3 bg-green-50 rounded-lg hover:bg-green-100 transition-colors cursor-pointer">
-              <p className="text-2xl font-bold text-green-600">450</p>
-              <p className="text-sm text-gray-600">Active Students</p>
-            </div>
-            <div className="text-center p-3 bg-orange-50 rounded-lg hover:bg-orange-100 transition-colors cursor-pointer">
-              <p className="text-2xl font-bold text-orange-600">12</p>
-              <p className="text-sm text-gray-600">Staff Members</p>
-            </div>
-            <div className="text-center p-3 bg-purple-50 rounded-lg hover:bg-purple-100 transition-colors cursor-pointer">
-              <div className="flex items-center justify-center space-x-1">
-                <p className="text-2xl font-bold text-purple-600">4.8</p>
-                <Star className="w-4 h-4 text-purple-600 fill-current" />
-              </div>
-              <p className="text-sm text-gray-600">Rating</p>
-            </div>
-          </div>
+        {/* Recent Complaints - Right side */}
+        <div>
+          <ListCard title="Recent Complaints" items={recentComplaints} />
         </div>
       </div>
     </div>
