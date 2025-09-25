@@ -2,10 +2,6 @@
 import React, { useState } from 'react';
 import { Routes, Route, Navigate, useNavigate } from 'react-router-dom';
 
-// Add this import with your other admin imports
-import Complaints from '../pages/admin/complaint';
-
-
 // ----------------------
 // Admin Pages & Layout
 // ----------------------
@@ -14,6 +10,7 @@ import Dashboard from '../pages/admin/dashboard';
 import Students from '../pages/admin/student';
 import Fees from '../pages/admin/fees';
 import Mess from '../pages/admin/mess';
+import Complaints from '../pages/admin/complaint';
 import { AdminLogin } from '../pages/admin/login';
 
 // ----------------------
@@ -25,6 +22,7 @@ import StudentLayout from '../layouts/studentlayout';
 import { OverviewTab } from '../pages/student/overviewTab';
 import { Login as StudentLogin } from '../pages/student/login';
 import { NewAdmission } from '../pages/student/newadmission';
+import { AdmissionContinuation } from '../pages/student/newadmissioncontinuation';
 import StudentFees from '../pages/student/fees';
 import { StudentAttendance } from '../pages/student/attendance';
 import { StudentMess } from '../pages/student/mess';
@@ -76,8 +74,13 @@ const AppRoutes: React.FC = () => {
   };
 
   const NewAdmissionWrapper: React.FC = () => {
-    const handleAdmissionComplete = () => navigate('/student/login');
+    const handleAdmissionComplete = () => navigate('/student/admission-continue');
     return <NewAdmission onPageChange={handleAdmissionComplete} />;
+  };
+
+  const AdmissionContinuationWrapper: React.FC = () => {
+    const handleAdmissionComplete = () => navigate('/student/login');
+    return <AdmissionContinuation onComplete={handleAdmissionComplete} />;
   };
 
   return (
@@ -89,33 +92,21 @@ const AppRoutes: React.FC = () => {
           Student Routes
       ---------------------- */}
       <Route path="/student" element={<StudentPortal />}>
-      <Route
-          path="/student/login"
+        <Route
+          path="login"
           element={
             isStudentAuthenticated ? 
-      <Navigate to="/student/dashboard" replace /> : 
-      <StudentLoginWrapper onLogin={handleStudentLogin} />
-      }
-    />
-    <Route path="new-admission" element={<NewAdmissionWrapper />} />
-    </Route>
+              <Navigate to="/student/dashboard" replace /> : 
+              <StudentLoginWrapper onLogin={handleStudentLogin} />
+          }
+        />
+        <Route path="new-admission" element={<NewAdmissionWrapper />} />
+      </Route>
 
-      
+      {/* Admission continuation route */}
+      <Route path="/student/admission-continue" element={<AdmissionContinuationWrapper />} />
 
-      <Route path="/student/new-admission" element={<NewAdmissionWrapper />} />
-
-      {/* Student protected routes (like admin layout) */}
-      <Route
-        path="/student"
-        element={
-          <ProtectedRoute isAuthenticated={isStudentAuthenticated} redirectPath="/student/login">
-            <StudentLayout onLogout={handleStudentLogout}>
-              <Navigate to="/student/dashboard" replace />
-            </StudentLayout>
-          </ProtectedRoute>
-        }
-      />
-
+      {/* Student protected routes */}
       <Route
         path="/student/dashboard"
         element={
@@ -238,18 +229,16 @@ const AppRoutes: React.FC = () => {
         }
       />
       
-     // Then replace the complaints route with this:
-<Route
-  path="/admin/complaint"
-  element={
-    <ProtectedRoute isAuthenticated={isAdminAuthenticated}>
-      <AdminLayout pageTitle="Notice & Complaints" onLogout={handleAdminLogout}>
-        <Complaints />
-      </AdminLayout>
-    </ProtectedRoute>
-  }
-/>
-      
+      <Route
+        path="/admin/complaints"
+        element={
+          <ProtectedRoute isAuthenticated={isAdminAuthenticated}>
+            <AdminLayout pageTitle="Notice & Complaints" onLogout={handleAdminLogout}>
+              <Complaints />
+            </AdminLayout>
+          </ProtectedRoute>
+        }
+      />
 
       {/* Catch-all */}
       <Route path="*" element={<Navigate to="/" replace />} />
