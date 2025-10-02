@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
+import javax.print.DocFlavor.STRING;
+
 
 
 
@@ -65,8 +67,8 @@ public class Student {
     @Column(name = "parent_contact", length = 15)
     private String parentContact;
     
-    @Column(name = "room_id")
-    private Integer roomId;
+    @Column(name = "room_id", length = 10 ,nullable = true)
+    private String roomId;
     
     @Column(name = "admission_fee", columnDefinition = "BOOLEAN DEFAULT FALSE")
     private Boolean admissionFee = false;
@@ -90,7 +92,7 @@ public class Student {
     public Student(String collegeId, String name, Gender gender, 
                    Course course, Stream stream, Year year, 
                    String email, String contactNo, String guardianName, 
-                   String guardianContact, String password)
+                   String guardianContact)
     {          
         this.collegeId = collegeId;
         this.name = name;
@@ -102,7 +104,6 @@ public class Student {
         this.contactNo = contactNo;
         this.guardianName = guardianName;
         this.guardianContact = guardianContact;
-        this.password = password;
         this.admissionDate = LocalDate.now();
         this.createdAt = LocalDateTime.now();
     }
@@ -210,11 +211,11 @@ public void setParentContact(String parentContact)
 { 
     this.parentContact = parentContact; 
 }
-public Integer getRoomId() 
+public String getRoomId() 
 { 
     return roomId; 
 }
-public void setRoomId(Integer roomId) 
+public void setRoomId(String roomId) 
 { 
     this.roomId = roomId; 
 }
