@@ -8,7 +8,6 @@ import com.entity.Fees;
 
 
 @Repository
-
 public interface FeesRepository extends JpaRepository<Fees, Integer> {
 
     @Modifying
