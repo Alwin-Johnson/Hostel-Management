@@ -4,10 +4,6 @@ import jakarta.persistence.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
-import javax.print.DocFlavor.STRING;
-
-
-
 
 @Entity
 @Table(name = "Student")

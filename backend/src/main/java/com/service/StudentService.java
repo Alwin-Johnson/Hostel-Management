@@ -106,6 +106,9 @@ public class StudentService {
         }
         return updated;
     }
+    public List<Student> getAllStudents() {
+        return studentRepository.findAll();
+    }
 }
 
 
