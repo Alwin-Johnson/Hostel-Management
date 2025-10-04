@@ -10,9 +10,6 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 import com.entity.Student;
 
-
-
-
 @Repository
 public interface StudentRepository extends JpaRepository<Student, Integer> {
     
@@ -23,7 +20,7 @@ public interface StudentRepository extends JpaRepository<Student, Integer> {
                            stream, year, email, contact_no, address, guardian_name, 
                            guardian_contact, parent_name, parent_contact, room_id, 
                            admission_fee, password, created_at) 
-        VALUES (?1  , ?2, ?3, ?4, ?5, ?6, ?7, ?8    , ?9, ?10, ?11, ?12, ?13, ?14, ?15, ?16, ?17, ?18, ?19)
+        VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11, ?12, ?13, ?14, ?15, ?16, ?17, ?18, ?19)
         """, nativeQuery = true)
     int insertStudent(String collegeId, String name, String gender, LocalDate dob, 
                      LocalDate admissionDate, String course, String stream, String year,
@@ -35,7 +32,6 @@ public interface StudentRepository extends JpaRepository<Student, Integer> {
     @Query(value = "SELECT * FROM Student WHERE email = ?1", nativeQuery = true)
     Optional<Student> findByEmail(String email);
     
-    
     @Query(value = "SELECT * FROM Student WHERE student_id = ?1", nativeQuery = true)
     Optional<Student> findById(Integer studentId);
     
@@ -45,17 +41,12 @@ public interface StudentRepository extends JpaRepository<Student, Integer> {
     @Query(value = "SELECT COUNT(*) FROM Student", nativeQuery = true)
     Long countAllStudents();
     
-    @Query(value = "SELECT COUNT(*) > 0 FROM Student WHERE email = ?1", nativeQuery = true)
+    // FIXED: Use standard JPA method (no custom query needed)
     boolean existsByEmail(String email);
-    
-    
-    
     
     @Query(value = "SELECT * FROM Student WHERE room_id = ?1", nativeQuery = true)
     List<Student> findStudentsByRoom(Integer roomId);
     
-   
- 
     // ===== UPDATE OPERATIONS =====
     @Modifying
     @Query(value = "UPDATE Student SET admission_fee = ?1 WHERE student_id = ?2", nativeQuery = true)
@@ -73,10 +64,8 @@ public interface StudentRepository extends JpaRepository<Student, Integer> {
     @Query(value = "UPDATE Student SET password = ?1 WHERE student_id = ?2", nativeQuery = true)
     int changePassword(String newPassword, Integer studentId);
     
-  
     // ===== DELETE OPERATIONS =====
-   // @Modifying
-    //@Query(value = "DELETE FROM Student WHERE student_id = ?1", nativeQuery = true)
-    //int deleteStudentById(Integer studentId);
-    
+    // @Modifying
+    // @Query(value = "DELETE FROM Student WHERE student_id = ?1", nativeQuery = true)
+    // int deleteStudentById(Integer studentId);
 }

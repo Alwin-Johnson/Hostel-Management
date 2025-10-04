@@ -5,6 +5,7 @@ import com.repository.StudentRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.sql.Date;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -19,32 +20,52 @@ public class StudentService {
         this.studentRepository = studentRepository;
     }
     
-    // ===== REGISTRATION METHOD =====
-    public Student registerStudent(String collegeId, String name, String gender, 
-                                 String course, String stream, String year,
-                                 String email, String contactNo, String guardianName,
-                                 String guardianContact) {
-        
-        // Default values
-        String password = "defaultPassword";
-        LocalDate admissionDate = LocalDate.now();
-        LocalDateTime createdAt = LocalDateTime.now();
-        Boolean admissionFee = false;
-        
-        // Insert student
-        int result = studentRepository.insertStudent(
-            collegeId, name, gender, null, admissionDate, course, stream, year,
-            email, contactNo, null, guardianName, guardianContact, 
-            null, null, null, admissionFee, password, createdAt
-        );
-        
-        if (result <= 0) {
-            throw new RuntimeException("Failed to register student");
-        }
-        
-        return studentRepository.findByEmail(email).orElse(null);
-    }
+    // ===== REGISTRATION METHOD (FIXED) =====
+   // ===== REGISTRATION METHOD (FIXED) =====
+public Student registerStudent(String collegeId, String name, String gender, Date dob,
+                             String course, String stream, String year,
+                             String email, String contactNo, String address, String guardianName,
+                             String guardianContact, String parentName, String parentContact) {
     
+    try {
+        // Convert String parameters to Enum types
+        Student.Gender genderEnum = Student.Gender.valueOf(gender);
+        Student.Course courseEnum = Student.Course.valueOf(course);
+        Student.Stream streamEnum = Student.Stream.valueOf(stream);
+        Student.Year yearEnum = Student.Year.valueOf(year);
+        
+        // Create student entity with proper enum types
+        Student student = new Student();
+        student.setCollegeId(collegeId);
+        student.setName(name);
+        student.setGender(genderEnum);
+        student.setCourse(courseEnum);
+        student.setStream(streamEnum);
+        student.setYear(yearEnum);
+        student.setEmail(email);
+        student.setContactNo(contactNo);
+        student.setAddress(address);
+        student.setGuardianName(guardianName);
+        student.setGuardianContact(guardianContact);
+        student.setParentName(parentName);
+        student.setParentContact(parentContact);
+        
+        // Set defaults
+        student.setPassword("defaultPassword");
+        student.setAdmissionDate(LocalDate.now());
+        student.setCreatedAt(LocalDateTime.now());
+        student.setAdmissionFee(false);
+        
+        // Use standard JPA save (avoids the casting issue)
+        return studentRepository.save(student);
+        
+    } catch (IllegalArgumentException e) {
+        throw new RuntimeException("Invalid enum value: " + e.getMessage());
+    } catch (Exception e) {
+        throw new RuntimeException("Failed to register student: " + e.getMessage());
+    }
+}
+
     // ===== LOGIN METHOD =====
     public Student login(String email, String password) {
         Student student = studentRepository.findByEmail(email).orElse(null);
@@ -92,13 +113,14 @@ public class StudentService {
         return studentRepository.findStudentsByRoom(roomId);
     }
     
-    int updateAdmissionFee(Boolean admissionFee, Integer studentId) {
+    public int updateAdmissionFee(Boolean admissionFee, Integer studentId) {
         int updated = studentRepository.updateAdmissionFee(admissionFee, studentId);
         if (updated <= 0) {
             throw new RuntimeException("Failed to update admission fee status");
         }
         return updated;
     }
+    
     public int assignRoom(Integer roomId, Integer studentId) {
         int updated = studentRepository.assignRoom(roomId, studentId);
         if (updated <= 0) {
