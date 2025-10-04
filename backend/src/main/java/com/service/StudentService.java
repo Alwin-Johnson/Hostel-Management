@@ -128,7 +128,6 @@ public Student registerStudent(String collegeId, String name, String gender, Dat
         }
         return updated;
     }
-    
     public List<Student> getAllStudents() {
         return studentRepository.findAll();
     }
