@@ -20,7 +20,7 @@ public class FeesService {
     }
 
     // ===== CREATE MONTHLY FEE RECORD =====
-    public Fees createMonthlyFee(Student student, Double amount) {
+   /* public Fees createMonthlyFee(Student student, Double amount) {
         Fees fees = new Fees();
         fees.setStudent(student);
         fees.setAmount(amount);
@@ -33,5 +33,26 @@ public class FeesService {
         fees.setStatus("PENDING");
 
         return feesRepository.save(fees);
+    }*/
+
+    public Double getCollectionPercent() {
+    try {
+        Double paid = feesRepository.paidFees();
+        Double total = feesRepository.totalFees();
+
+        // Handle null or zero values
+        if (paid == null || total == null || total == 0) {
+            return 0.0;
+        }
+
+        double percent = (paid / total) * 100;
+        return Math.round(percent * 100.0) / 100.0; // round to 2 decimal places
+
+        } catch (Exception e) {
+            // Log the exception and return 0 to keep the app stable
+            System.err.println("Error calculating collection percent: " + e.getMessage());
+            return 0.0;
+        }
     }
+
 }

@@ -32,10 +32,10 @@ public interface FeesRepository extends JpaRepository<Fees, Integer> {
     double pendingFees();
 
     @Query(value = "SELECT SUM(amount) FROM Fees WHERE status = 'PAID'", nativeQuery = true)
-    Long paidFees();
+    double paidFees();
 
     @Query(value = "SELECT SUM(amount) FROM Fees", nativeQuery = true)
-    Long totalFees();
+    double totalFees();
 
     @Query(value = "SELECT COUNT(*) FROM Fees WHERE status = 'PENDING'", nativeQuery = true)
     Long countPendingFees();
