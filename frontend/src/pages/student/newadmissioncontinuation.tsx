@@ -1,5 +1,5 @@
 // src/pages/student/AdmissionContinuation.tsx
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from '../../components/student/button';
 import { Input } from '../../components/student/input';
 import { Label } from '../../components/student/label';
@@ -10,6 +10,7 @@ import { Check, CreditCard, Building, User, ArrowRight, ArrowLeft } from 'lucide
 
 interface AdmissionContinuationProps {
   onComplete?: () => void;
+  studentId?: string; // Pass studentId from registration (string or number)
 }
 
 interface PaymentData {
@@ -18,6 +19,7 @@ interface PaymentData {
 }
 
 interface RoomData {
+  roomId: number;
   roomNo: string;
   floor: string;
   type: string;
@@ -33,131 +35,56 @@ interface CredentialsData {
   confirmPassword: string;
 }
 
-const availableRooms = [
-  // Single Rooms
-  { 
-    roomNo: 'A101', 
-    floor: '1st Floor', 
-    type: 'Single Room', 
-    monthlyRent: 1000, 
+const availableRooms: RoomData[] = [
+  {
+    roomId: 1,
+    roomNo: 'A101',
+    floor: '1st Floor',
+    type: 'Single Room',
+    monthlyRent: 1000,
     occupants: [],
     maxOccupancy: 1,
     block: 'Block A'
   },
-  { 
-    roomNo: 'A102', 
-    floor: '1st Floor', 
-    type: 'Single Room', 
-    monthlyRent: 1000, 
+  {
+    roomId: 2,
+    roomNo: 'A102',
+    floor: '1st Floor',
+    type: 'Single Room',
+    monthlyRent: 1000,
     occupants: [],
     maxOccupancy: 1,
     block: 'Block A'
   },
-  { 
-    roomNo: 'B201', 
-    floor: '2nd Floor', 
-    type: 'Single Room', 
-    monthlyRent: 1000, 
-    occupants: [],
-    maxOccupancy: 1,
-    block: 'Block B'
-  },
-
-  // Double Sharing Rooms
-  { 
-    roomNo: 'A201', 
-    floor: '2nd Floor', 
-    type: 'Double Sharing', 
-    monthlyRent: 667, 
-    occupants: [
-      { name: 'Rahul Sharma', course: 'B.Tech CSE', year: '2nd Year' }
-    ],
-    maxOccupancy: 2,
-    block: 'Block A'
-  },
-  { 
-    roomNo: 'A202', 
-    floor: '2nd Floor', 
-    type: 'Double Sharing', 
-    monthlyRent: 667, 
-    occupants: [],
-    maxOccupancy: 2,
-    block: 'Block A'
-  },
-  { 
-    roomNo: 'B301', 
-    floor: '3rd Floor', 
-    type: 'Double Sharing', 
-    monthlyRent: 667, 
-    occupants: [
-      { name: 'Priya Patel', course: 'B.Tech ECE', year: '3rd Year' }
-    ],
-    maxOccupancy: 2,
-    block: 'Block B'
-  },
-
-  // Triple Sharing Rooms
-  { 
-    roomNo: 'C101', 
-    floor: '1st Floor', 
-    type: 'Triple Sharing', 
-    monthlyRent: 500, 
-    occupants: [
-      { name: 'Amit Kumar', course: 'B.Tech ME', year: '1st Year' },
-      { name: 'Suresh Gupta', course: 'B.Tech CE', year: '2nd Year' }
-    ],
-    maxOccupancy: 3,
-    block: 'Block C'
-  },
-  { 
-    roomNo: 'C102', 
-    floor: '1st Floor', 
-    type: 'Triple Sharing', 
-    monthlyRent: 500, 
-    occupants: [
-      { name: 'Vikash Singh', course: 'B.Tech CSE', year: '1st Year' }
-    ],
-    maxOccupancy: 3,
-    block: 'Block C'
-  },
-
-  // Four Sharing Rooms
-  { 
-    roomNo: 'D201', 
-    floor: '2nd Floor', 
-    type: 'Four Sharing', 
-    monthlyRent: 417, 
-    occupants: [
-      { name: 'Ravi Verma', course: 'B.Tech EE', year: '2nd Year' },
-      { name: 'Kiran Joshi', course: 'B.Tech CSE', year: '1st Year' },
-      { name: 'Deepak Roy', course: 'B.Tech ME', year: '3rd Year' }
-    ],
-    maxOccupancy: 4,
-    block: 'Block D'
-  },
-  { 
-    roomNo: 'D202', 
-    floor: '2nd Floor', 
-    type: 'Four Sharing', 
-    monthlyRent: 417, 
-    occupants: [],
-    maxOccupancy: 4,
-    block: 'Block D'
-  }
+  // Add other rooms here...
 ];
 
-export const AdmissionContinuation: React.FC<AdmissionContinuationProps> = ({ onComplete }) => {
+export const AdmissionContinuation: React.FC<AdmissionContinuationProps> = ({ onComplete, studentId: propStudentId }) => {
   const [currentStep, setCurrentStep] = useState<number>(2);
   const [paymentData, setPaymentData] = useState<PaymentData>({ method: '', amount: 5000 });
   const [selectedRoom, setSelectedRoom] = useState<RoomData | null>(null);
   const [roomFilter, setRoomFilter] = useState<string>('all');
+
   const [credentials, setCredentials] = useState<CredentialsData>({
-    studentId: `HST2025${Math.floor(1000 + Math.random() * 9000)}`,
+    studentId: '',
     password: '',
     confirmPassword: ''
   });
+
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [isProcessing, setIsProcessing] = useState<boolean>(false);
+
+  useEffect(() => {
+    // Initialize studentId from props or from localStorage
+    if (propStudentId) {
+      setCredentials(prev => ({ ...prev, studentId: propStudentId }));
+    } else {
+      const storedId = localStorage.getItem('studentId');
+      if (storedId) {
+        setCredentials(prev => ({ ...prev, studentId: storedId }));
+      }
+    }
+  }, [propStudentId]);
 
   const steps = [
     { number: 1, title: 'Application Submitted', completed: true },
@@ -186,7 +113,7 @@ export const AdmissionContinuation: React.FC<AdmissionContinuationProps> = ({ on
 
   const validateCredentials = (): boolean => {
     const newErrors: { [key: string]: string } = {};
-    
+
     if (!credentials.password) {
       newErrors.password = 'Password is required';
     } else if (credentials.password.length < 8) {
@@ -194,52 +121,112 @@ export const AdmissionContinuation: React.FC<AdmissionContinuationProps> = ({ on
     } else if (!/(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/.test(credentials.password)) {
       newErrors.password = 'Password must contain uppercase, lowercase, and number';
     }
-    
+
     if (!credentials.confirmPassword) {
       newErrors.confirmPassword = 'Please confirm your password';
     } else if (credentials.password !== credentials.confirmPassword) {
       newErrors.confirmPassword = 'Passwords do not match';
     }
-    
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
   const handlePayment = async (): Promise<void> => {
     if (!validatePayment()) return;
-    
+    if (!credentials.studentId) {
+      toast.error('Student ID is missing.');
+      return;
+    }
+
     setIsProcessing(true);
-    await new Promise(resolve => setTimeout(resolve, 2000));
-    
-    toast.success('Payment successful! Proceeding to room selection.');
-    setCurrentStep(3);
-    setIsProcessing(false);
+    try {
+      const response = await fetch('http://localhost:8080/api/students/register/admissionfee', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ studentId: credentials.studentId })
+      });
+
+      if (!response.ok) {
+        const err = await response.text();
+        throw new Error(err || 'Payment update failed');
+      }
+
+      toast.success('Payment successful! Proceeding to room selection.');
+      setCurrentStep(3);
+    } catch (error) {
+      toast.error(`Payment failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    } finally {
+      setIsProcessing(false);
+    }
   };
 
   const handleRoomSelection = async (): Promise<void> => {
     if (!validateRoomSelection()) return;
-    
+    if (!credentials.studentId || !selectedRoom) {
+      toast.error('Student ID or room selection missing.');
+      return;
+    }
+
     setIsProcessing(true);
-    await new Promise(resolve => setTimeout(resolve, 1500));
-    
-    toast.success('Room allocated successfully!');
-    setCurrentStep(4);
-    setIsProcessing(false);
+    try {
+      const response = await fetch('http://localhost:8080/api/students/register/roomid', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          studentId: credentials.studentId,
+          roomId: selectedRoom.roomId
+        })
+      });
+
+      if (!response.ok) {
+        const err = await response.text();
+        throw new Error(err || 'Room assignment failed');
+      }
+
+      toast.success('Room allocated successfully!');
+      setCurrentStep(4);
+
+    } catch (error) {
+      toast.error(`Room assignment failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    } finally {
+      setIsProcessing(false);
+    }
   };
 
   const handleCredentialsSetup = async (): Promise<void> => {
     if (!validateCredentials()) return;
-    
+    if (!credentials.studentId) {
+      toast.error('Student ID is missing.');
+      return;
+    }
+
     setIsProcessing(true);
-    await new Promise(resolve => setTimeout(resolve, 2000));
-    
-    toast.success('Account created successfully! Redirecting to login...');
-    setTimeout(() => {
-      onComplete && onComplete();
-    }, 2000);
-    setIsProcessing(false);
+    try {
+      const response = await fetch('http://localhost:8080/api/students/register/passwordsetting', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          studentId: credentials.studentId,
+          password: credentials.password
+        })
+      });
+
+      if (!response.ok) {
+        const err = await response.text();
+        throw new Error(err || 'Password setup failed');
+      }
+
+      toast.success('Account created successfully! Redirecting to login...');
+      setTimeout(() => onComplete && onComplete(), 2000);
+    } catch (error) {
+      toast.error(`Password setup failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    } finally {
+      setIsProcessing(false);
+    }
   };
 
+ 
   const StepIndicator: React.FC = () => (
     <div className="flex items-center justify-center mb-8 px-4">
       {steps.map((step, index) => (
@@ -310,7 +297,7 @@ export const AdmissionContinuation: React.FC<AdmissionContinuationProps> = ({ on
           <Button
             onClick={handlePayment}
             disabled={isProcessing}
-            className="w-full h-12 bg-blue-600 hover:bg-blue-700 text-white rounded-xl shadow-lg transition-all duration-300 hover:scale-105"
+            className="w-full h-12 bg-blue-600 hover:bg-blue-700 text-white rounded-xl shadow-lg transition-all duration-300 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {isProcessing ? (
               <div className="flex items-center space-x-2">
@@ -343,7 +330,6 @@ export const AdmissionContinuation: React.FC<AdmissionContinuationProps> = ({ on
       <CardContent className="p-8">
         <div className="space-y-6">
           
-          {/* Filter by Room Type */}
           <div className="flex flex-wrap gap-2 mb-6">
             <Button 
               variant={roomFilter === 'all' ? 'default' : 'outline'}
@@ -364,7 +350,6 @@ export const AdmissionContinuation: React.FC<AdmissionContinuationProps> = ({ on
             ))}
           </div>
 
-          {/* Room Cards */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {availableRooms
               .filter(room => roomFilter === 'all' || room.type === roomFilter)
@@ -378,7 +363,6 @@ export const AdmissionContinuation: React.FC<AdmissionContinuationProps> = ({ on
                     : 'border-gray-200 hover:border-blue-300 hover:bg-gray-50'
                 }`}
               >
-                {/* Room Header - Removed slots left */}
                 <div className="flex justify-between items-start mb-4">
                   <div>
                     <h3 className="text-xl font-bold text-gray-800">{room.roomNo}</h3>
@@ -386,13 +370,11 @@ export const AdmissionContinuation: React.FC<AdmissionContinuationProps> = ({ on
                   </div>
                 </div>
 
-                {/* Room Type and Price */}
                 <div className="mb-4">
                   <p className="text-lg font-semibold text-blue-600">{room.type}</p>
                   <p className="text-2xl font-bold text-gray-800">₹{room.monthlyRent}/month</p>
                 </div>
 
-                {/* Current Occupants */}
                 <div>
                   <p className="text-sm font-semibold text-gray-700 mb-2">
                     Current Occupants ({room.occupants.length}/{room.maxOccupancy}):
@@ -430,7 +412,7 @@ export const AdmissionContinuation: React.FC<AdmissionContinuationProps> = ({ on
             <Button
               onClick={handleRoomSelection}
               disabled={isProcessing || !selectedRoom}
-              className="flex-1 h-12 bg-green-600 hover:bg-green-700 text-white rounded-xl shadow-lg transition-all duration-300 hover:scale-105"
+              className="flex-1 h-12 bg-green-600 hover:bg-green-700 text-white rounded-xl shadow-lg transition-all duration-300 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isProcessing ? (
                 <div className="flex items-center space-x-2">
@@ -531,7 +513,7 @@ export const AdmissionContinuation: React.FC<AdmissionContinuationProps> = ({ on
             <Button
               onClick={handleCredentialsSetup}
               disabled={isProcessing}
-              className="flex-1 h-12 bg-blue-600 hover:bg-blue-700 text-white rounded-xl shadow-lg transition-all duration-300 hover:scale-105"
+              className="flex-1 h-12 bg-blue-600 hover:bg-blue-700 text-white rounded-xl shadow-lg transition-all duration-300 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isProcessing ? (
                 <div className="flex items-center space-x-2">
