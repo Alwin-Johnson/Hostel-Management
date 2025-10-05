@@ -19,10 +19,9 @@ public class StudentService {
     public StudentService(StudentRepository studentRepository) {
         this.studentRepository = studentRepository;
     }
-    
-    // ===== REGISTRATION METHOD (FIXED) =====
-   // ===== REGISTRATION METHOD (FIXED) =====
-public Student registerStudent(String collegeId, String name, String gender, Date dob,
+
+   // ===== REGISTRATION METHOD  =====
+public Student registerStudent(String collegeId, String name, String gender, LocalDate dob,
                              String course, String stream, String year,
                              String email, String contactNo, String address, String guardianName,
                              String guardianContact, String parentName, String parentContact) {
@@ -41,6 +40,7 @@ public Student registerStudent(String collegeId, String name, String gender, Dat
         student.setGender(genderEnum);
         student.setCourse(courseEnum);
         student.setStream(streamEnum);
+        student.setDob(dob);
         student.setYear(yearEnum);
         student.setEmail(email);
         student.setContactNo(contactNo);
@@ -90,11 +90,12 @@ public Student registerStudent(String collegeId, String name, String gender, Dat
         return studentRepository.findById(studentId).orElse(null);
     }
 
-    public void changePassword(Integer studentId, String newPassword) {
+    public int changePassword(Integer studentId, String newPassword) {
         int updated = studentRepository.changePassword(newPassword, studentId);
         if (updated <= 0) {
             throw new RuntimeException("Failed to change password");
         }
+        return updated;
     }
 
     public List<Student> findAllStudents() {

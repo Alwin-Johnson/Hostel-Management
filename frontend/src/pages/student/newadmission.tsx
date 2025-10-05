@@ -10,9 +10,10 @@ import { toast } from 'sonner';
 
 interface NewAdmissionProps {
   onPageChange?: (page: string) => void;
+  setStudentId?: (id: number) => void;
 }
 
-export const NewAdmission: React.FC<NewAdmissionProps> = ({ onPageChange }) => {
+export const NewAdmission: React.FC<NewAdmissionProps> = ({ onPageChange, setStudentId }) => {
   const [applicationData, setApplicationData] = useState({
     name: '', email: '', phone: '', dateOfBirth: '', gender: '', course: '', stream: '', year: '',
     collegeAdmissionNo: '', parentName: '', parentPhone: '', guardianName: '', guardianPhone: '',
@@ -20,8 +21,9 @@ export const NewAdmission: React.FC<NewAdmissionProps> = ({ onPageChange }) => {
   });
 
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Validation functions
+  // ===== Validation Functions =====
   const validateName = (name: string): string => {
     const nameRegex = /^[a-zA-Z\s]+$/;
     if (!name.trim()) return 'This field is required';
@@ -76,8 +78,6 @@ export const NewAdmission: React.FC<NewAdmissionProps> = ({ onPageChange }) => {
 
   const validateForm = (): boolean => {
     const newErrors: { [key: string]: string } = {};
-    
-    // All fields are now required
     newErrors.name = validateName(applicationData.name);
     newErrors.email = validateEmail(applicationData.email);
     newErrors.phone = validatePhone(applicationData.phone);
@@ -99,6 +99,7 @@ export const NewAdmission: React.FC<NewAdmissionProps> = ({ onPageChange }) => {
     return Object.values(newErrors).every(error => !error);
   };
 
+  // ===== Input Handling =====
   const handleInputChange = (field: string, value: string): void => {
     setApplicationData({ ...applicationData, [field]: value });
     if (errors[field]) {
@@ -106,26 +107,82 @@ export const NewAdmission: React.FC<NewAdmissionProps> = ({ onPageChange }) => {
     }
   };
 
-  const handleApplicationSubmit = (e: React.FormEvent): void => {
+  const getYearText = (year: string): string => {
+    const yearMap: { [key: string]: string } = { '1': 'First', '2': 'Second', '3': 'Third', '4': 'Fourth' };
+    return yearMap[year] || year;
+  };
+
+  // ===== Registration Submission Logic =====
+  const handleApplicationSubmit = async (e: React.FormEvent): Promise<void> => {
     e.preventDefault();
-    
     if (!validateForm()) {
       toast.error('Please fill all required fields correctly');
       return;
     }
 
-    console.log('Application Data:', applicationData);
-    toast.success('Application submitted successfully! We will inform you soon about your status.');
-    setTimeout(() => onPageChange && onPageChange('landing'), 2000);
+    setIsSubmitting(true);
+    try {
+      const requestBody = {
+        collegeId: applicationData.collegeAdmissionNo,
+        name: applicationData.name,
+        gender: applicationData.gender.charAt(0).toUpperCase() + applicationData.gender.slice(1),
+        dob: applicationData.dateOfBirth,
+        course: applicationData.course === 'btech' ? 'BTech' : 'MTech',
+        stream: applicationData.stream.toUpperCase(),
+        year: getYearText(applicationData.year),
+        email: applicationData.email,
+        contactNo: applicationData.phone,
+        address: applicationData.address,
+        guardianName: applicationData.guardianName,
+        guardianContact: applicationData.guardianPhone,
+        parentName: applicationData.parentName,
+        parentContact: applicationData.parentPhone
+      };
+
+      const response = await fetch('http://localhost:8080/api/students/register/form', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(requestBody)
+      });
+
+      if (!response.ok) {
+        const errorData = await response.text();
+        throw new Error(errorData || 'Registration failed');
+      }
+
+      const data = await response.json();
+      console.log('Registration successful:', data);
+
+      if (data.studentId) {
+        setStudentId && setStudentId(data.studentId); // <-- store in parent/global
+        localStorage.setItem('studentId', data.studentId.toString()); // <-- enables use after reload
+      }
+
+      toast.success('Application submitted successfully! We will inform you soon about your status.');
+      setApplicationData({
+        name: '', email: '', phone: '', dateOfBirth: '', gender: '', course: '', stream: '', year: '',
+        collegeAdmissionNo: '', parentName: '', parentPhone: '', guardianName: '', guardianPhone: '',
+        address: '', roomPreference: '', messType: ''
+      });
+
+      setTimeout(() => onPageChange && onPageChange('continuation'), 1500);
+
+    } catch (error) {
+      console.error('Error submitting application:', error);
+      toast.error(`Failed to submit application: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
-  const inputClass = (field: string): string => 
-    `h-12 rounded-xl transition-all duration-300 hover:shadow-lg focus:scale-105 ${
-      errors[field] ? 'border-red-500 focus:ring-red-500' : ''
-    }`;
-
-  const ErrorText: React.FC<{ field: string }> = ({ field }) => 
+  const inputClass = (field: string): string =>
+    `h-12 rounded-xl transition-all duration-300 hover:shadow-lg focus:scale-105 ${errors[field] ? 'border-red-500 focus:ring-red-500' : ''}`;
+  
+  const ErrorText: React.FC<{ field: string }> = ({ field }) =>
     errors[field] ? <p className="text-red-500 text-sm mt-1">{errors[field]}</p> : null;
+
+  // ===== Render Form =====
+  
 
   return (
     <>
@@ -258,9 +315,9 @@ export const NewAdmission: React.FC<NewAdmissionProps> = ({ onPageChange }) => {
                       <SelectContent className="bg-white border border-gray-200 shadow-lg">
                         <SelectItem value="cse" className="text-gray-900 hover:bg-gray-100 focus:bg-gray-100">CSE</SelectItem>
                         <SelectItem value="ece" className="text-gray-900 hover:bg-gray-100 focus:bg-gray-100">ECE</SelectItem>
-                        <SelectItem value="me" className="text-gray-900 hover:bg-gray-100 focus:bg-gray-100">Mechanical</SelectItem>
-                        <SelectItem value="ce" className="text-gray-900 hover:bg-gray-100 focus:bg-gray-100">Civil</SelectItem>
-                        <SelectItem value="ee" className="text-gray-900 hover:bg-gray-100 focus:bg-gray-100">Electrical</SelectItem>
+                        <SelectItem value="mechanical" className="text-gray-900 hover:bg-gray-100 focus:bg-gray-100">Mechanical</SelectItem>
+                        <SelectItem value="civil" className="text-gray-900 hover:bg-gray-100 focus:bg-gray-100">Civil</SelectItem>
+                        <SelectItem value="electrical" className="text-gray-900 hover:bg-gray-100 focus:bg-gray-100">Electrical</SelectItem>
                       </SelectContent>
                     </Select>
                     <ErrorText field="stream" />
@@ -420,9 +477,10 @@ export const NewAdmission: React.FC<NewAdmissionProps> = ({ onPageChange }) => {
               <div className="flex justify-center pt-4 animate-slide-in" style={{ animationDelay: '1.2s' }}>
                 <Button 
                   type="submit" 
-                  className="w-full max-w-md h-12 bg-blue-600 hover:bg-blue-700 text-white rounded-xl shadow-lg transition-all duration-300 hover:scale-105 hover:shadow-xl animate-pulse-glow"
+                  disabled={isSubmitting}
+                  className="w-full max-w-md h-12 bg-blue-600 hover:bg-blue-700 text-white rounded-xl shadow-lg transition-all duration-300 hover:scale-105 hover:shadow-xl animate-pulse-glow disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  Submit Application
+                  {isSubmitting ? 'Submitting...' : 'Submit Application'}
                 </Button>
               </div>
 
