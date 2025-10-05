@@ -11,9 +11,8 @@ public class Fees {
     @Column(name = "fee_id")
     private Integer feeId;
 
-    @ManyToOne
-    @JoinColumn(name = "student_id", nullable = false)
-    private Student student;
+    @Column(name = "student_id", nullable = false)
+    private Integer studentId;
 
     @Column(name = "amount", nullable = false)
     private Double amount;
@@ -24,21 +23,16 @@ public class Fees {
     @Column(name = "paid_date", nullable = true)
     private String paidDate;
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "status", nullable = false, length = 20, columnDefinition = "VARCHAR(20) CHECK (status IN ('PAID', 'PENDING'))")
+    @Column(name = "status", nullable = false, length = 20)
     private String status;
-
-    @Enumerated(EnumType.STRING)
+    
     @Column(name = "payment_mode", nullable = true)
     private String paymentMode;
 
-    public enum Status { PAID, PENDING }
-    public enum PaymentMode { CASH, ONLINE }
-
     public Fees() {}
     
-    public Fees(Student student, Double amount, String dueDate, String paidDate, String status, String paymentMode) {
-        this.student = student;
+    public Fees(Integer studentId, Double amount, String dueDate, String paidDate, String status, String paymentMode) {
+        this.studentId = studentId;
         this.amount = amount;
         this.dueDate = dueDate;
         this.paidDate = paidDate;
@@ -54,12 +48,12 @@ public class Fees {
         this.feeId = feeId;
     }
 
-    public Student getStudent() {
-        return student;
+    public Integer getStudent() {
+        return studentId;
     }
 
-    public void setStudent(Student student) {
-        this.student = student;
+    public void setStudent(Integer studentId) {
+        this.studentId = studentId;
     }
 
     public Double getAmount() {

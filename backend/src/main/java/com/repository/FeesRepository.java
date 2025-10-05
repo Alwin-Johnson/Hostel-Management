@@ -28,7 +28,7 @@ public interface FeesRepository extends JpaRepository<Fees, Integer> {
         """, nativeQuery = true)
     int updateFees(Integer studentId, Double amount, String dueDate, String paidDate, String status, String paymentMode);
 
-    @Query(value = "SELECT SUM(amount) FROM Fees", nativeQuery = true)
+    @Query(value = "SELECT SUM(amount) FROM Fees WHERE status = 'PENDING'", nativeQuery = true)
     double pendingFees();
 
     @Query(value = "SELECT SUM(amount) FROM Fees WHERE status = 'PAID'", nativeQuery = true)

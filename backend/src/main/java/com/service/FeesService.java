@@ -1,7 +1,6 @@
 package com.service;
 
 import com.entity.Fees;
-import com.entity.Student;
 import com.repository.FeesRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,9 +19,9 @@ public class FeesService {
     }
 
     // ===== CREATE MONTHLY FEE RECORD =====
-    public Fees createMonthlyFee(Student student, Double amount) {
+    public Fees createMonthlyFee(Integer studentId, Double amount) {
         Fees fees = new Fees();
-        fees.setStudent(student);
+        fees.setStudent(studentId);
         fees.setAmount(amount);
         
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
