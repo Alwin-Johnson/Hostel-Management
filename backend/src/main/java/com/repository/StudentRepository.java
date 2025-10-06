@@ -44,6 +44,12 @@ public interface StudentRepository extends JpaRepository<Student, Integer> {
     // FIXED: Use standard JPA method (no custom query needed)
     boolean existsByEmail(String email);
     
+
+    @Query(value ="SELECT s.name AS Name, s.student_id AS studentId, r.room_no AS roomNo, s.admission_date AS admissionDate, f.amount AS fee, f.status AS feeStatus FROM student s LEFT JOIN rooms r ON s.room_id = r.room_id LEFT JOIN fees f ON s.student_id = f.student_id", nativeQuery = true)
+    List<Object[]> findStudentRoomFeeInfo();
+
+
+
     @Query(value = "SELECT * FROM Student WHERE room_id = ?1", nativeQuery = true)
     List<Student> findStudentsByRoom(Integer roomId);
     

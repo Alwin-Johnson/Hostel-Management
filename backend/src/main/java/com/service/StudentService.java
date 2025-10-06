@@ -81,6 +81,17 @@ public Student registerStudent(String collegeId, String name, String gender, Loc
         return student;
     }
 
+
+public List<Object[]> findStudentRoomFeeInfo() {
+    return studentRepository.findStudentRoomFeeInfo();
+}
+
+
+
+
+
+
+
     // ===== UTILITY METHODS =====
     public Student findByEmail(String email) {
         return studentRepository.findByEmail(email).orElse(null);

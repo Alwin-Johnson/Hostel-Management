@@ -153,4 +153,25 @@ public ResponseEntity<?> updateRoomId(@RequestBody Map<String, String> params) {
             return ResponseEntity.badRequest().body("Login failed: " + e.getMessage());
         }
     }
+
+    // Dashboard
+    @GetMapping("Admin/dashboard/student-count")
+    public ResponseEntity<Long> getStudentCount() {
+        Long count = studentService.countAllStudents();
+        return ResponseEntity.ok(count);
+    }
+
+    @GetMapping("Admin/student/table")
+    public ResponseEntity<?> getStudentRoomFeeInfo() {
+        try {
+            return ResponseEntity.ok(studentService.findStudentRoomFeeInfo());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                                 .body("Failed to retrieve data: " + e.getMessage());
+        }
+    }
+
+
+
+
 }
