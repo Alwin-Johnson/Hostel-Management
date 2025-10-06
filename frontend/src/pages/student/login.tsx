@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Button } from "../../components/student/button";
 import { Input } from "../../components/student/input";
 import { Label } from '../../components/student/label';
-import { User, ArrowLeft, Lock } from "lucide-react";
+import { User, ArrowLeft } from "lucide-react";
 import { toast } from "sonner";
 
 interface LoginProps {
@@ -13,22 +13,42 @@ interface LoginProps {
 export const Login: React.FC<LoginProps> = ({ onLogin, onPageChange }) => {
   const [loginData, setLoginData] = useState({ userId: '', password: '' });
   const [isLoading, setIsLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
 
-  const handleLogin = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!loginData.userId || !loginData.password) {
-      toast.error('Please fill in all required fields');
+  const handleLogin = async (e: React.FormEvent) => {
+  e.preventDefault();
+  setErrorMessage('');
+  if (!loginData.userId || !loginData.password) {
+    setErrorMessage('Please fill in all required fields');
+    return;
+  }
+
+  setIsLoading(true);
+  try {
+    const response = await fetch(`http://localhost:8080/api/students/login?email=${encodeURIComponent(loginData.userId)}&password=${encodeURIComponent(loginData.password)}`, {
+      method: 'GET',
+    });
+
+    if (!response.ok) {
+      setErrorMessage('Invalid email or password. Please check your credentials and try again.');
+      setIsLoading(false);
       return;
     }
 
-    setIsLoading(true); // start buffering
+    const student = await response.json();
+
     toast.success('Login successful! Redirecting...');
-    
     setTimeout(() => {
-      setIsLoading(false); // stop buffering
+      setIsLoading(false);
       onLogin();
-    }, 1500); // simulate delay
-  };
+    }, 1500);
+
+  } catch (error) {
+    setErrorMessage('Login error. Please try again later.');
+    setIsLoading(false);
+  }
+};
+
 
   const handleForgotPassword = () => {
     toast('Password recovery flow coming soon!');
@@ -58,6 +78,12 @@ export const Login: React.FC<LoginProps> = ({ onLogin, onPageChange }) => {
           <h2 className="text-2xl md:text-3xl font-bold text-gray-900">Student Login</h2>
           <p className="text-gray-600 mt-1">Enter your credentials to access your dashboard</p>
         </div>
+
+        {errorMessage && (
+          <div className="mb-4 p-3 bg-red-100 text-red-700 rounded">
+            {errorMessage}
+          </div>
+        )}
 
         <form onSubmit={handleLogin} className="space-y-4">
           <div className="space-y-2">
@@ -97,9 +123,7 @@ export const Login: React.FC<LoginProps> = ({ onLogin, onPageChange }) => {
 
           <Button
             type="submit"
-            className={`w-full h-12 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white rounded-xl shadow-md hover:shadow-lg transition-all duration-300 ${
-              isLoading ? 'opacity-70 cursor-not-allowed' : ''
-            }`}
+            className={`w-full h-12 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white rounded-xl shadow-md hover:shadow-lg transition-all duration-300 ${isLoading ? 'opacity-70 cursor-not-allowed' : ''}`}
             disabled={isLoading}
           >
             {isLoading ? 'Logging in...' : 'Login to Dashboard'}
