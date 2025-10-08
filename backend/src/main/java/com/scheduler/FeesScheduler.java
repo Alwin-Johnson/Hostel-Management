@@ -29,7 +29,7 @@ public class FeesScheduler {
         double monthlyFeeAmount = 2000.0;   //dummy valueeee change later
 
         for (Student student : students) {
-            feesService.createMonthlyFee(student, monthlyFeeAmount);
+            feesService.createMonthlyFee(student.getStudentId(), monthlyFeeAmount);
         }
     }
 }
