@@ -1,12 +1,7 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { 
   Search, 
-  Plus, 
-  Filter, 
-  MoreHorizontal,
-  Eye,
-  Edit,
-  Trash2,
+  Plus,
   ChevronDown,
   X,
   Check,
@@ -49,129 +44,7 @@ interface NewStudentData {
   admissionDate: string;
 }
 
-// Sample student data with extended information
-const initialStudentsData: Student[] = [
-  {
-    id: 'ST001',
-    avatar: 'AK',
-    name: 'Arun Kumar',
-    studentId: 'ST20001',
-    roomNo: 'A101',
-    block: 'ADMIN BLOCK',
-    admissionDate: '2023-01-15',
-    feeStatus: 'paid',
-    dueAmount: 0,
-    email: 'arun.kumar@email.com',
-    phone: '+91 98765 43210',
-    dateOfBirth: '2002-05-20',
-    gender: 'Male',
-    mailingAddress: '123 Main St, Bangalore, KA 560001',
-    feeHistory: [
-      { invoiceId: 'fee1', date: '2023-01-10', amount: 50000, status: 'paid' },
-      { invoiceId: 'fee2', date: '2023-07-10', amount: 50000, status: 'paid' }
-    ]
-  },
-  {
-    id: 'ST002', 
-    avatar: 'PS',
-    name: 'Priya Sharma',
-    studentId: 'ST20002',
-    roomNo: 'B205',
-    block: 'SOUTH BLOCK',
-    admissionDate: '2023-02-20',
-    feeStatus: 'overdue',
-    dueAmount: 15000,
-    email: 'priya.sharma@email.com',
-    phone: '+91 98765 43211',
-    dateOfBirth: '2001-08-15',
-    gender: 'Female',
-    mailingAddress: '456 Park Ave, Chennai, TN 600001',
-    feeHistory: [
-      { invoiceId: 'fee3', date: '2023-02-15', amount: 50000, status: 'paid' },
-      { invoiceId: 'fee4', date: '2023-08-15', amount: 50000, status: 'overdue' }
-    ]
-  },
-  {
-    id: 'ST003',
-    avatar: 'RP',
-    name: 'Raj Patel',
-    studentId: 'ST20003', 
-    roomNo: 'C301',
-    block: 'NORTH BLOCK',
-    admissionDate: '2023-01-10',
-    feeStatus: 'paid',
-    dueAmount: 0,
-    email: 'raj.patel@email.com',
-    phone: '+91 98765 43212',
-    dateOfBirth: '2002-03-10',
-    gender: 'Male',
-    mailingAddress: '789 Center St, Mumbai, MH 400001',
-    feeHistory: [
-      { invoiceId: 'fee5', date: '2023-01-05', amount: 50000, status: 'paid' },
-      { invoiceId: 'fee6', date: '2023-07-05', amount: 50000, status: 'paid' }
-    ]
-  },
-  {
-    id: 'ST004',
-    avatar: 'SR',
-    name: 'Sneha Reddy',
-    studentId: 'ST20004',
-    roomNo: 'A205',
-    block: 'ADMIN BLOCK', 
-    admissionDate: '2023-03-05',
-    feeStatus: 'pending',
-    dueAmount: 8500,
-    email: 'sneha.reddy@email.com',
-    phone: '+91 98765 43213',
-    dateOfBirth: '2002-11-25',
-    gender: 'Female',
-    mailingAddress: '321 South St, Hyderabad, TS 500001',
-    feeHistory: [
-      { invoiceId: 'fee7', date: '2023-03-01', amount: 50000, status: 'paid' },
-      { invoiceId: 'fee8', date: '2023-09-01', amount: 50000, status: 'pending' }
-    ]
-  },
-  {
-    id: 'ST005',
-    avatar: 'VS',
-    name: 'Vikram Singh',
-    studentId: 'ST20005',
-    roomNo: 'B101',
-    block: 'SOUTH BLOCK',
-    admissionDate: '2023-01-25',
-    feeStatus: 'paid',
-    dueAmount: 0,
-    email: 'vikram.singh@email.com',
-    phone: '+91 98765 43214',
-    dateOfBirth: '2001-12-05',
-    gender: 'Male',
-    mailingAddress: '654 North Ave, Delhi, DL 110001',
-    feeHistory: [
-      { invoiceId: 'fee9', date: '2023-01-20', amount: 50000, status: 'paid' },
-      { invoiceId: 'fee10', date: '2023-07-20', amount: 50000, status: 'paid' }
-    ]
-  },
-  {
-    id: 'ST006',
-    avatar: 'AJ', 
-    name: 'Anita Joshi',
-    studentId: 'ST20006',
-    roomNo: 'C205',
-    block: 'NORTH BLOCK',
-    admissionDate: '2023-02-15',
-    feeStatus: 'overdue',
-    dueAmount: 22000,
-    email: 'anita.joshi@email.com',
-    phone: '+91 98765 43215',
-    dateOfBirth: '2002-04-18',
-    gender: 'Female',
-    mailingAddress: '987 East St, Pune, MH 411001',
-    feeHistory: [
-      { invoiceId: 'fee11', date: '2023-02-10', amount: 50000, status: 'paid' },
-      { invoiceId: 'fee12', date: '2023-08-10', amount: 50000, status: 'overdue' }
-    ]
-  }
-];
+
 
 // Notification Component
 const Notification: React.FC<{
@@ -454,7 +327,7 @@ const formatCurrency = (amount: number): string => {
 };
 
 const Students: React.FC = () => {
-  const [studentsData, setStudentsData] = useState<Student[]>(initialStudentsData);
+  const [studentsData, setStudentsData] = useState<Student[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedBlock, setSelectedBlock] = useState('');
   const [selectedStatus, setSelectedStatus] = useState('');
@@ -462,22 +335,41 @@ const Students: React.FC = () => {
   const [sortConfig, setSortConfig] = useState<{ column: string; direction: 'asc' | 'desc' } | null>(null);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [selectedStudent, setSelectedStudent] = useState<Student | null>(null);
-  const [notification, setNotification] = useState<{
-    type: 'success' | 'error' | 'info';
-    message: string;
-  } | null>(null);
+  const [notification, setNotification] = useState<{ type: 'success' | 'error' | 'info'; message: string } | null>(null);
+
+  // Fetch student data from backend when component mounts
+ React.useEffect(() => {
+  fetch('http://localhost:8080/api/students/Admin/student/table')
+    .then(res => {
+      if (!res.ok) throw new Error('Failed to load student data');
+      return res.json();
+    })
+    .then(data => {
+      // Map from array of objects with property keys
+      const mappedData = data.map((row: any) => ({
+        id: `ST${row.studentId}`,
+        avatar: row.name ? row.name.split(' ').map((w: string) => w[0]).join('').toUpperCase() : '',
+        name: row.name,
+        studentId: `ST${row.studentId}`,
+        roomNo: row.roomNo,
+        admissionDate: row.admissionDate,
+        feeStatus: row.feeStatus || 'pending',
+        dueAmount: row.fee ?? 0
+        // add more if you have more fields on the backend
+      }));
+      setStudentsData(mappedData);
+    })
+    .catch(err => {
+      setNotification({ type: 'error', message: 'Failed to load student data.' });
+    });
+}, []);
 
   // Get unique blocks for filter dropdown
-  const blocks = useMemo(() => {
-    return Array.from(new Set(studentsData.map(student => student.block)));
-  }, [studentsData]);
+  const blocks = useMemo(() => Array.from(new Set(studentsData.map(student => student.block))), [studentsData]);
 
-  // Generate avatar from name
-  const generateAvatar = (name: string): string => {
-    return name.split(' ').map(word => word[0]).join('').toUpperCase();
-  };
+  const generateAvatar = (name: string): string =>
+    name.split(' ').map(word => word[0]).join('').toUpperCase();
 
-  // Generate unique student ID
   const generateStudentId = (): string => {
     const maxId = studentsData.reduce((max, student) => {
       const num = parseInt(student.studentId.replace('ST', ''));
@@ -486,7 +378,6 @@ const Students: React.FC = () => {
     return `ST${maxId + 1}`;
   };
 
-  // Show notification
   const showNotification = (type: 'success' | 'error' | 'info', message: string) => {
     setNotification({ type, message });
     setTimeout(() => {
@@ -494,7 +385,6 @@ const Students: React.FC = () => {
     }, 5000);
   };
 
-  // Handle add student
   const handleAddStudent = (newStudentData: NewStudentData) => {
     const newStudent: Student = {
       id: `ST${Date.now()}`,
@@ -505,7 +395,7 @@ const Students: React.FC = () => {
       block: newStudentData.block,
       admissionDate: newStudentData.admissionDate,
       feeStatus: 'pending',
-      dueAmount: 10000, // Default due amount for new students
+      dueAmount: 10000,
       email: newStudentData.email,
       phone: newStudentData.phone,
       dateOfBirth: undefined,
@@ -513,16 +403,12 @@ const Students: React.FC = () => {
       mailingAddress: undefined,
       feeHistory: []
     };
-
     setStudentsData(prev => [newStudent, ...prev]);
     showNotification('success', `Student ${newStudentData.name} has been added successfully!`);
   };
 
-  // Filter and search students
   const filteredStudents = useMemo(() => {
     let filtered = studentsData;
-
-    // Search filter
     if (searchTerm) {
       filtered = filtered.filter(student =>
         student.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -530,27 +416,19 @@ const Students: React.FC = () => {
         student.roomNo.toLowerCase().includes(searchTerm.toLowerCase())
       );
     }
-
-    // Block filter
     if (selectedBlock) {
       filtered = filtered.filter(student => student.block === selectedBlock);
     }
-
-    // Status filter
     if (selectedStatus) {
       filtered = filtered.filter(student => student.feeStatus === selectedStatus);
     }
-
-    // Sorting
     if (sortConfig) {
       filtered.sort((a, b) => {
         const aValue = a[sortConfig.column as keyof Student];
         const bValue = b[sortConfig.column as keyof Student];
-        
         if (aValue === undefined && bValue === undefined) return 0;
         if (aValue === undefined) return sortConfig.direction === 'asc' ? 1 : -1;
         if (bValue === undefined) return sortConfig.direction === 'asc' ? -1 : 1;
-        
         if (aValue < bValue) {
           return sortConfig.direction === 'asc' ? -1 : 1;
         }
@@ -560,7 +438,6 @@ const Students: React.FC = () => {
         return 0;
       });
     }
-
     return filtered;
   }, [searchTerm, selectedBlock, selectedStatus, sortConfig, studentsData]);
 
@@ -570,32 +447,20 @@ const Students: React.FC = () => {
         setSelectedStudent(student);
         break;
       case 'edit':
-        console.log('Edit student:', student);
         showNotification('info', `Edit functionality for ${student.name} coming soon`);
         break;
       case 'delete':
-        console.log('Delete student:', student);
         showNotification('info', `Delete functionality for ${student.name} coming soon`);
         break;
     }
   };
 
-  const handleSort = (column: string, direction: 'asc' | 'desc') => {
-    setSortConfig({ column, direction });
-  };
+  const handleSort = (column: string, direction: 'asc' | 'desc') => setSortConfig({ column, direction });
 
-  const handleStudentClick = (student: Student) => {
-    setSelectedStudent(student);
-  };
+  const handleStudentClick = (student: Student) => setSelectedStudent(student);
 
-  // If a student is selected, show the profile view
   if (selectedStudent) {
-    return (
-      <StudentProfile 
-        student={selectedStudent} 
-        onBack={() => setSelectedStudent(null)} 
-      />
-    );
+    return <StudentProfile student={selectedStudent} onBack={() => setSelectedStudent(null)} />;
   }
 
   const columns: TableColumn<Student>[] = [
@@ -604,7 +469,7 @@ const Students: React.FC = () => {
       header: 'Student',
       sortable: true,
       render: (_, student) => (
-        <div 
+        <div
           className="flex items-center space-x-3 cursor-pointer hover:bg-blue-50 -m-2 p-2 rounded transition-colors"
           onClick={() => handleStudentClick(student)}
         >
@@ -622,9 +487,7 @@ const Students: React.FC = () => {
       key: 'studentId',
       header: 'Student ID',
       sortable: true,
-      render: (value) => (
-        <span className="font-mono text-sm">{value}</span>
-      )
+      render: value => <span className="font-mono text-sm">{value}</span>
     },
     {
       key: 'roomNo',
@@ -640,7 +503,7 @@ const Students: React.FC = () => {
       key: 'admissionDate',
       header: 'Admission Date',
       sortable: true,
-      render: (value) => {
+      render: value => {
         const date = new Date(value);
         return (
           <span className="text-sm">
@@ -656,13 +519,13 @@ const Students: React.FC = () => {
     {
       key: 'feeStatus',
       header: 'Fee Status',
-      render: (value) => <StatusBadge status={value} />
+      render: value => <StatusBadge status={value} />
     },
     {
       key: 'dueAmount',
       header: 'Due Amount',
       sortable: true,
-      render: (value) => (
+      render: value => (
         <span className={`font-medium ${value > 0 ? 'text-red-600' : 'text-green-600'}`}>
           {formatCurrency(value)}
         </span>
@@ -672,7 +535,6 @@ const Students: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      {/* Notification */}
       {notification && (
         <Notification
           type={notification.type}
@@ -680,34 +542,27 @@ const Students: React.FC = () => {
           onClose={() => setNotification(null)}
         />
       )}
-
-      {/* Add Student Modal */}
       <AddStudentModal
         isOpen={isAddModalOpen}
         onClose={() => setIsAddModalOpen(false)}
         onSubmit={handleAddStudent}
       />
-
-      {/* Header Section with Filters and Add Button */}
       <div className="flex items-center justify-between space-x-4">
         <div className="flex items-center space-x-4 flex-1">
-          {/* Search */}
           <div className="relative flex-1 max-w-md">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
             <input
               type="text"
               placeholder="Search by Name / Student ID"
               value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+              onChange={e => setSearchTerm(e.target.value)}
               className="w-full pl-10 pr-4 py-2 bg-gray-100 border-0 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white"
             />
           </div>
-
-          {/* Block Filter */}
           <div className="relative">
             <select
               value={selectedBlock}
-              onChange={(e) => setSelectedBlock(e.target.value)}
+              onChange={e => setSelectedBlock(e.target.value)}
               className="appearance-none bg-white border border-gray-300 rounded-lg px-3 py-2 pr-8 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
             >
               <option value="">Select Block</option>
@@ -717,12 +572,10 @@ const Students: React.FC = () => {
             </select>
             <ChevronDown className="absolute right-2 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
           </div>
-
-          {/* Status Filter */}
           <div className="relative">
             <select
               value={selectedStatus}
-              onChange={(e) => setSelectedStatus(e.target.value)}
+              onChange={e => setSelectedStatus(e.target.value)}
               className="appearance-none bg-white border border-gray-300 rounded-lg px-3 py-2 pr-8 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
             >
               <option value="">Select Fee Status</option>
@@ -733,9 +586,7 @@ const Students: React.FC = () => {
             <ChevronDown className="absolute right-2 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
           </div>
         </div>
-
-        {/* Add Student Button */}
-        <button 
+        <button
           onClick={() => setIsAddModalOpen(true)}
           className="flex items-center space-x-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
         >
@@ -743,8 +594,6 @@ const Students: React.FC = () => {
           <span>Add new student</span>
         </button>
       </div>
-
-      {/* Results Count */}
       <div className="text-sm text-gray-600">
         Showing {filteredStudents.length} of {studentsData.length} students
         {selectedStudents.length > 0 && (
@@ -753,8 +602,6 @@ const Students: React.FC = () => {
           </span>
         )}
       </div>
-
-      {/* Students Table */}
       <Table
         data={filteredStudents}
         columns={columns}

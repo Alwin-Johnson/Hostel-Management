@@ -6,9 +6,15 @@ package com.controller;
 import com.entity.Student;
 import com.service.StudentService;
 
-import java.time.LocalDate;
-import java.util.Map;
 
+import java.time.LocalDate;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+
+
+import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -162,14 +168,29 @@ public ResponseEntity<?> updateRoomId(@RequestBody Map<String, String> params) {
     }
 
     @GetMapping("Admin/student/table")
-    public ResponseEntity<?> getStudentRoomFeeInfo() {
-        try {
-            return ResponseEntity.ok(studentService.findStudentRoomFeeInfo());
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                                 .body("Failed to retrieve data: " + e.getMessage());
-        }
+public ResponseEntity<?> getStudentRoomFeeInfo() {
+    try {
+        List<Object[]> rawData = studentService.findStudentRoomFeeInfo();
+
+        
+        List<Map<String, Object>> mappedList = rawData.stream().map(row -> {
+            Map<String, Object> map = new HashMap<>();
+            map.put("name", row[0]);
+            map.put("studentId", row[1]);
+            map.put("roomNo", row[2]);
+            map.put("admissionDate", row[3]);
+            map.put("fee", row[4]);
+            map.put("feeStatus", row[5]);
+            return map;
+        }).collect(Collectors.toList());
+
+        return ResponseEntity.ok(mappedList);
+    } catch (Exception e) {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body("Failed to retrieve data: " + e.getMessage());
     }
+}
+
 
 
 
