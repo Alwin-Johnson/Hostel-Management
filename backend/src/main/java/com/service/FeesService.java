@@ -1,7 +1,8 @@
 package com.service;
 
+import java.util.List;
+
 import com.entity.Fees;
-import com.entity.Student;
 import com.repository.FeesRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,9 +21,9 @@ public class FeesService {
     }
 
     // ===== CREATE MONTHLY FEE RECORD =====
-   /* public Fees createMonthlyFee(Student student, Double amount) {
+  public Fees createMonthlyFee(Integer studentId, Double amount) {
         Fees fees = new Fees();
-        fees.setStudent(student);
+        fees.setStudent(studentId);
         fees.setAmount(amount);
         
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
@@ -33,12 +34,12 @@ public class FeesService {
         fees.setStatus("PENDING");
 
         return feesRepository.save(fees);
-    }*/
+    }
 
     public Double getCollectionPercent() {
     try {
-        Double paid = feesRepository.paidFees();
-        Double total = feesRepository.totalFees();
+        Double paid = feesRepository.getPaidFees();
+        Double total = feesRepository.getTotalFees();
 
         // Handle null or zero values
         if (paid == null || total == null || total == 0) {
@@ -53,6 +54,49 @@ public class FeesService {
             System.err.println("Error calculating collection percent: " + e.getMessage());
             return 0.0;
         }
+    }
+    public Double getPendingFees() {
+        return feesRepository.getPendingFees();
+    }
+    public Double getPaidFees() {
+        return feesRepository.getPaidFees();
+    }
+    public Double getTotalFees() {
+        return feesRepository.getTotalFees();
+    }
+    public Long countPendingFees() {
+        return feesRepository.countPendingFees();
+    }
+    public Long countPaidFees() {
+        return feesRepository.countPaidFees();
+    }
+    public Long countTotalFees() {
+        return feesRepository.countTotalFees();
+    }
+    public Double getPaidCountPercent(){
+            Long paidCount = feesRepository.countPaidFees();
+            Long totalCount = feesRepository.countTotalFees();
+
+            // Handle null or zero values
+            if (paidCount == null || totalCount == null || totalCount == 0) {
+                return 0.0;
+            }
+            double percent = ((double) paidCount / totalCount) * 100;
+            return Math.round(percent * 100.0) / 100.0; // round to 2 decimal places
+    }
+    public Double getPendingCountPercent(){
+            Long pendingCount = feesRepository.countPendingFees();
+            Long totalCount = feesRepository.countTotalFees();
+
+            // Handle null or zero values
+            if (pendingCount == null || totalCount == null || totalCount == 0) {
+                return 0.0;
+            }
+            double percent = ((double) pendingCount / totalCount) * 100;
+            return Math.round(percent * 100.0) / 100.0; // round to 2 decimal places
+    }
+    public List<Object[]> getFeeInfo() {
+        return feesRepository.getFeeInfo();
     }
 
 }
