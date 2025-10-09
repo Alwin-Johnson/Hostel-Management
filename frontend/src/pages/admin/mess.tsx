@@ -14,7 +14,7 @@ const Mess = () => {
   const [editingTime, setEditingTime] = useState(null);
   const [mealImages, setMealImages] = useState({
     breakfast: 'https://images.unsplash.com/photo-1589301760014-d929f3979dbc?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80',
-    lunch: 'https://images.unsplash.com/photo-1563379091339-03246963d67c?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80',
+    lunch: 'https://images.unsplash.com/photo-1680993032090-1ef7ea9b51e5?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTV8fGtlcmFsYSUyMGx1bmNofGVufDB8fDB8fHww',
     dinner: 'https://images.unsplash.com/photo-1565557623262-b51c2513a641?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80'
   });
 
