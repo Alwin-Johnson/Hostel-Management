@@ -30,8 +30,15 @@ public interface RoomsRepository extends JpaRepository<Rooms, Integer> {
     @Query(value = "SELECT * FROM Rooms", nativeQuery = true)
     List<Rooms> findAllRooms();
 
-    @Query(value = "SELECT * FROM Rooms WHERE status = 'available'", nativeQuery = true)
-    List<Rooms> findAvailableRooms();
+    @Query(value = "SELECT capacity FROM Rooms WHERE room_Id=?1", nativeQuery = true)
+    Integer findCapacityByRoomId(Integer roomId);
+
+
+     @Query(value = "SELECT current_occupants FROM Rooms WHERE room_Id=?1", nativeQuery = true)
+    Integer findCurrentOccupantsByRoomId(Integer roomId);
+
+    @Query(value = "SELECT  room_id,room_No, room_type,floor, monthly_rent,current_occupants FROM Rooms WHERE status = 'available'", nativeQuery = true)
+    List<Object []> findAvailableRooms();
 
     // ===== UPDATE OPERATIONS =====
     @Modifying

@@ -10,7 +10,7 @@ import { Check, CreditCard, Building, User, ArrowRight, ArrowLeft } from 'lucide
 
 interface AdmissionContinuationProps {
   onComplete?: () => void;
-  studentId?: string; // Pass studentId from registration (string or number)
+  studentId?: string;
 }
 
 interface PaymentData {
@@ -19,14 +19,15 @@ interface PaymentData {
 }
 
 interface RoomData {
-  roomId: number;
-  roomNo: string;
-  floor: string;
-  type: string;
-  monthlyRent: number;
-  occupants: Array<{ name: string; course: string; year: string }>;
-  maxOccupancy: number;
-  block: string;
+  roomId?: number;
+  roomNo?: string;
+  floor?: string;
+  type?: string;
+  monthlyRent?: number;
+  occupants?: Array<{ name: string; course: string; year: string }>;
+  maxOccupancy?: number;
+  block?: string;
+  currentOccupancy?: number;
 }
 
 interface CredentialsData {
@@ -35,35 +36,13 @@ interface CredentialsData {
   confirmPassword: string;
 }
 
-const availableRooms: RoomData[] = [
-  {
-    roomId: 1,
-    roomNo: 'A101',
-    floor: '1st Floor',
-    type: 'Single Room',
-    monthlyRent: 1000,
-    occupants: [],
-    maxOccupancy: 1,
-    block: 'Block A'
-  },
-  {
-    roomId: 2,
-    roomNo: 'A102',
-    floor: '1st Floor',
-    type: 'Single Room',
-    monthlyRent: 1000,
-    occupants: [],
-    maxOccupancy: 1,
-    block: 'Block A'
-  },
-  // Add other rooms here...
-];
-
 export const AdmissionContinuation: React.FC<AdmissionContinuationProps> = ({ onComplete, studentId: propStudentId }) => {
   const [currentStep, setCurrentStep] = useState<number>(2);
   const [paymentData, setPaymentData] = useState<PaymentData>({ method: '', amount: 5000 });
   const [selectedRoom, setSelectedRoom] = useState<RoomData | null>(null);
   const [roomFilter, setRoomFilter] = useState<string>('all');
+  const [availableRooms, setAvailableRooms] = useState<RoomData[]>([]);
+  const [isLoadingRooms, setIsLoadingRooms] = useState<boolean>(false);
 
   const [credentials, setCredentials] = useState<CredentialsData>({
     studentId: '',
@@ -86,6 +65,61 @@ export const AdmissionContinuation: React.FC<AdmissionContinuationProps> = ({ on
     }
   }, [propStudentId]);
 
+  // Fetch available rooms when reaching room selection step
+  useEffect(() => {
+    if (currentStep === 3) {
+      fetchAvailableRooms();
+    }
+  }, [currentStep]);
+
+  const fetchAvailableRooms = async (): Promise<void> => {
+    setIsLoadingRooms(true);
+    try {
+      const response = await fetch('http://localhost:8080/api/rooms/available', {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json' }
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch available rooms');
+      }
+
+      const data = await response.json();
+      console.log('Fetched rooms raw data:', data);
+      
+      // Transform array of arrays to array of objects
+      // Backend returns: [room_id, room_No, room_type, floor, monthly_rent, current_occupants]
+      const transformedRooms: RoomData[] = data.map((room: any[]) => ({
+        roomId: room[0],
+        roomNo: room[1],
+        type: room[2],
+        floor: room[3],
+        monthlyRent: room[4],
+        currentOccupancy: room[5],
+        maxOccupancy: getMaxOccupancyFromType(room[2]),
+        occupants: []
+      }));
+      
+      console.log('Transformed rooms:', transformedRooms);
+      setAvailableRooms(transformedRooms);
+    } catch (error) {
+      console.error('Error fetching rooms:', error);
+      toast.error(`Failed to load rooms: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      setAvailableRooms([]);
+    } finally {
+      setIsLoadingRooms(false);
+    }
+  };
+
+  // Helper function to determine max occupancy from room type
+  const getMaxOccupancyFromType = (type: string): number => {
+    if (type.includes('Single')) return 1;
+    if (type.includes('Double')) return 2;
+    if (type.includes('Triple')) return 3;
+    if (type.includes('Four')) return 4;
+    return 1; // Default
+  };
+
   const steps = [
     { number: 1, title: 'Application Submitted', completed: true },
     { number: 2, title: 'Payment', completed: currentStep > 2, active: currentStep === 2 },
@@ -104,7 +138,7 @@ export const AdmissionContinuation: React.FC<AdmissionContinuationProps> = ({ on
 
   const validateRoomSelection = (): boolean => {
     const newErrors: { [key: string]: string } = {};
-    if (!selectedRoom) {
+    if (!selectedRoom || !selectedRoom.roomId) {
       newErrors.roomType = 'Please select a room';
     }
     setErrors(newErrors);
@@ -163,14 +197,15 @@ export const AdmissionContinuation: React.FC<AdmissionContinuationProps> = ({ on
 
   const handleRoomSelection = async (): Promise<void> => {
     if (!validateRoomSelection()) return;
-    if (!credentials.studentId || !selectedRoom) {
+    if (!credentials.studentId || !selectedRoom?.roomId) {
       toast.error('Student ID or room selection missing.');
       return;
     }
 
     setIsProcessing(true);
     try {
-      const response = await fetch('http://localhost:8080/api/students/register/roomid', {
+      // First, assign room to student
+      const assignResponse = await fetch('http://localhost:8080/api/students/register/roomid', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -179,9 +214,22 @@ export const AdmissionContinuation: React.FC<AdmissionContinuationProps> = ({ on
         })
       });
 
-      if (!response.ok) {
-        const err = await response.text();
+      if (!assignResponse.ok) {
+        const err = await assignResponse.text();
         throw new Error(err || 'Room assignment failed');
+      }
+
+      // Then, update room login count
+      const updateResponse = await fetch('http://localhost:8080/api/rooms/updateRoomLogin', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          roomId: selectedRoom.roomId
+        })
+      });
+
+      if (!updateResponse.ok) {
+        console.warn('Room login update failed, but room was assigned');
       }
 
       toast.success('Room allocated successfully!');
@@ -226,7 +274,6 @@ export const AdmissionContinuation: React.FC<AdmissionContinuationProps> = ({ on
     }
   };
 
- 
   const StepIndicator: React.FC = () => (
     <div className="flex items-center justify-center mb-8 px-4">
       {steps.map((step, index) => (
@@ -317,121 +364,162 @@ export const AdmissionContinuation: React.FC<AdmissionContinuationProps> = ({ on
     </Card>
   );
 
-  const RoomSelectionStep: React.FC = () => (
-    <Card className="bg-white shadow-xl rounded-3xl">
-      <CardHeader className="text-center pb-6">
-        <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-          <Building className="w-8 h-8 text-green-600" />
-        </div>
-        <CardTitle className="text-2xl font-bold text-gray-900">Room Allocation</CardTitle>
-        <p className="text-gray-600">Select your preferred room based on availability and details</p>
-      </CardHeader>
-      
-      <CardContent className="p-8">
-        <div className="space-y-6">
-          
-          <div className="flex flex-wrap gap-2 mb-6">
-            <Button 
-              variant={roomFilter === 'all' ? 'default' : 'outline'}
-              onClick={() => setRoomFilter('all')}
-              className="rounded-full"
-            >
-              All Rooms
-            </Button>
-            {['Single Room', 'Double Sharing', 'Triple Sharing', 'Four Sharing'].map(type => (
+  const RoomSelectionStep: React.FC = () => {
+    const filteredRooms = availableRooms.filter(room => 
+      roomFilter === 'all' || room.type === roomFilter
+    );
+
+    return (
+      <Card className="bg-white shadow-xl rounded-3xl">
+        <CardHeader className="text-center pb-6">
+          <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <Building className="w-8 h-8 text-green-600" />
+          </div>
+          <CardTitle className="text-2xl font-bold text-gray-900">Room Allocation</CardTitle>
+          <p className="text-gray-600">Select your preferred room based on availability and details</p>
+        </CardHeader>
+        
+        <CardContent className="p-8">
+          <div className="space-y-6">
+            
+            <div className="flex flex-wrap gap-2 mb-6">
               <Button 
-                key={type}
-                variant={roomFilter === type ? 'default' : 'outline'}
-                onClick={() => setRoomFilter(type)}
-                className="rounded-full text-sm"
+                variant={roomFilter === 'all' ? 'default' : 'outline'}
+                onClick={() => setRoomFilter('all')}
+                className="rounded-full"
               >
-                {type}
+                All Rooms
               </Button>
-            ))}
-          </div>
+              {['Single Room', 'Double Sharing', 'Triple Sharing', 'Four Sharing'].map(type => (
+                <Button 
+                  key={type}
+                  variant={roomFilter === type ? 'default' : 'outline'}
+                  onClick={() => setRoomFilter(type)}
+                  className="rounded-full text-sm"
+                >
+                  {type}
+                </Button>
+              ))}
+            </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {availableRooms
-              .filter(room => roomFilter === 'all' || room.type === roomFilter)
-              .map((room) => (
-              <div
-                key={room.roomNo}
-                onClick={() => setSelectedRoom(room)}
-                className={`p-6 rounded-xl border-2 cursor-pointer transition-all duration-300 ${
-                  selectedRoom?.roomNo === room.roomNo
-                    ? 'border-blue-500 bg-blue-50 shadow-lg'
-                    : 'border-gray-200 hover:border-blue-300 hover:bg-gray-50'
-                }`}
-              >
-                <div className="flex justify-between items-start mb-4">
-                  <div>
-                    <h3 className="text-xl font-bold text-gray-800">{room.roomNo}</h3>
-                    <p className="text-sm text-gray-600">{room.block} • {room.floor}</p>
-                  </div>
-                </div>
-
-                <div className="mb-4">
-                  <p className="text-lg font-semibold text-blue-600">{room.type}</p>
-                  <p className="text-2xl font-bold text-gray-800">₹{room.monthlyRent}/month</p>
-                </div>
-
-                <div>
-                  <p className="text-sm font-semibold text-gray-700 mb-2">
-                    Current Occupants ({room.occupants.length}/{room.maxOccupancy}):
-                  </p>
-                  {room.occupants.length === 0 ? (
-                    <p className="text-sm text-gray-500 italic">No current occupants</p>
-                  ) : (
-                    <div className="space-y-2">
-                      {room.occupants.map((occupant, index) => (
-                        <div key={index} className="text-xs bg-gray-100 p-2 rounded">
-                          <p className="font-medium">{occupant.name}</p>
-                          <p className="text-gray-600">{occupant.course} • {occupant.year}</p>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
+            {isLoadingRooms ? (
+              <div className="flex justify-center items-center py-12">
+                <div className="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin" />
+                <span className="ml-3 text-gray-600">Loading available rooms...</span>
               </div>
-            ))}
-          </div>
+            ) : filteredRooms.length === 0 ? (
+              <div className="text-center py-12">
+                <Building className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+                <p className="text-gray-600 text-lg font-medium">
+                  {availableRooms.length === 0 
+                    ? 'No rooms available at the moment.' 
+                    : `No ${roomFilter} available.`}
+                </p>
+                <p className="text-gray-500 text-sm mt-2">Please try a different filter or check back later.</p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {filteredRooms.map((room) => (
+                  <div
+                    key={room.roomId}
+                    onClick={() => setSelectedRoom(room)}
+                    className={`p-6 rounded-xl border-2 cursor-pointer transition-all duration-300 ${
+                      selectedRoom?.roomId === room.roomId
+                        ? 'border-blue-500 bg-blue-50 shadow-lg scale-105'
+                        : 'border-gray-200 hover:border-blue-300 hover:bg-gray-50 hover:shadow-md'
+                    }`}
+                  >
+                    <div className="flex justify-between items-start mb-4">
+                      <div>
+                        <h3 className="text-xl font-bold text-gray-800">
+                          Room {room.roomNo || 'N/A'}
+                        </h3>
+                        <p className="text-sm text-gray-600">
+                          {room.floor || 'N/A'}
+                        </p>
+                      </div>
+                      {selectedRoom?.roomId === room.roomId && (
+                        <div className="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center">
+                          <Check className="w-4 h-4 text-white" />
+                        </div>
+                      )}
+                    </div>
 
-          {errors.roomType && (
-            <p className="text-red-500 text-sm text-center">{errors.roomType}</p>
-          )}
+                    <div className="mb-4">
+                      <p className="text-lg font-semibold text-blue-600">
+                        {room.type || 'N/A'}
+                      </p>
+                      <p className="text-2xl font-bold text-gray-800">
+                        ₹{room.monthlyRent || 0}/month
+                      </p>
+                    </div>
 
-          <div className="flex space-x-4">
-            <Button
-              onClick={() => setCurrentStep(2)}
-              variant="outline"
-              className="flex-1 h-12 rounded-xl"
-            >
-              <ArrowLeft className="w-4 h-4 mr-2" />
-              Back
-            </Button>
-            <Button
-              onClick={handleRoomSelection}
-              disabled={isProcessing || !selectedRoom}
-              className="flex-1 h-12 bg-green-600 hover:bg-green-700 text-white rounded-xl shadow-lg transition-all duration-300 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {isProcessing ? (
-                <div className="flex items-center space-x-2">
-                  <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                  <span>Allocating...</span>
-                </div>
-              ) : (
-                <div className="flex items-center space-x-2">
-                  <Building className="w-5 h-5" />
-                  <span>Confirm Room {selectedRoom?.roomNo || 'Selection'}</span>
-                  <ArrowRight className="w-4 h-4" />
-                </div>
-              )}
-            </Button>
+                    <div className="border-t pt-3">
+                      <p className="text-sm font-semibold text-gray-700 mb-2">
+                        Occupancy: {room.currentOccupancy || 0}/{room.maxOccupancy || 0}
+                      </p>
+                      <div className="w-full bg-gray-200 rounded-full h-2">
+                        <div 
+                          className="bg-blue-500 h-2 rounded-full transition-all duration-300"
+                          style={{ 
+                            width: `${((room.currentOccupancy || 0) / (room.maxOccupancy || 1)) * 100}%` 
+                          }}
+                        />
+                      </div>
+                      {room.occupants && room.occupants.length > 0 && (
+                        <div className="mt-3 space-y-2">
+                          <p className="text-xs font-semibold text-gray-600">Current Occupants:</p>
+                          {room.occupants.map((occupant, index) => (
+                            <div key={index} className="text-xs bg-gray-100 p-2 rounded">
+                              <p className="font-medium">{occupant.name}</p>
+                              <p className="text-gray-600">{occupant.course} • {occupant.year}</p>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {errors.roomType && (
+              <p className="text-red-500 text-sm text-center">{errors.roomType}</p>
+            )}
+
+            <div className="flex space-x-4">
+              <Button
+                onClick={() => setCurrentStep(2)}
+                variant="outline"
+                className="flex-1 h-12 rounded-xl"
+              >
+                <ArrowLeft className="w-4 h-4 mr-2" />
+                Back
+              </Button>
+              <Button
+                onClick={handleRoomSelection}
+                disabled={isProcessing || !selectedRoom}
+                className="flex-1 h-12 bg-green-600 hover:bg-green-700 text-white rounded-xl shadow-lg transition-all duration-300 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {isProcessing ? (
+                  <div className="flex items-center space-x-2">
+                    <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                    <span>Allocating...</span>
+                  </div>
+                ) : (
+                  <div className="flex items-center space-x-2">
+                    <Building className="w-5 h-5" />
+                    <span>Confirm Room {selectedRoom?.roomNo || 'Selection'}</span>
+                    <ArrowRight className="w-4 h-4" />
+                  </div>
+                )}
+              </Button>
+            </div>
           </div>
-        </div>
-      </CardContent>
-    </Card>
-  );
+        </CardContent>
+      </Card>
+    );
+  };
 
   const CredentialsStep: React.FC = () => (
     <Card className="bg-white shadow-xl rounded-3xl">
