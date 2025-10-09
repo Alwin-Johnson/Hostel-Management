@@ -48,7 +48,7 @@ public interface FeesRepository extends JpaRepository<Fees, Integer> {
     @Query(value = "SELECT COUNT(*) FROM Fees", nativeQuery = true)
     Long countTotalFees();
 
-    @Query(value ="SELECT s.name AS Name, s.student_id AS studentId, r.room_no AS roomNo, f.amount AS fee,  f.status AS feeStatus FROM student s LEFT JOIN rooms r ON s.room_id = r.room_id LEFT JOIN fees f ON s.student_id = f.student_id", nativeQuery = true)
+    @Query(value ="SELECT s.student_id AS studentId, s.name AS Name, r.room_no AS roomNo, f.amount AS fee,  f.status AS feeStatus FROM student s LEFT JOIN rooms r ON s.room_id = r.room_id LEFT JOIN fees f ON s.student_id = f.student_id", nativeQuery = true)
     List<Object[]> getFeeInfo();
     
     @Modifying

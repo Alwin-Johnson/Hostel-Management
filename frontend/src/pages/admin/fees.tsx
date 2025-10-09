@@ -72,12 +72,12 @@ const FeeBreakdownChart: React.FC<FeeBreakdownChartProps> = ({ paidPercent, pend
   const total = data.reduce((sum, item) => sum + item.value, 0);
 
   return (
-    <div className="bg-white rounded-xl p-6 shadow-sm">
-      <h3 className="text-lg font-semibold text-gray-900 mb-4">Fee Breakdown</h3>
+    <div className="bg-white rounded-xl p-8 shadow-sm h-full flex flex-col">
+      <h3 className="text-lg font-semibold text-gray-900 mb-6">Fee Breakdown</h3>
       
-      <div className="flex items-center justify-center mb-6">
-        <div className="relative w-40 h-40">
-          <svg className="w-40 h-40 transform -rotate-90" viewBox="0 0 100 100">
+      <div className="flex items-center justify-center mb-8 flex-grow">
+        <div className="relative w-52 h-52">
+          <svg className="w-52 h-52 transform -rotate-90" viewBox="0 0 100 100">
             <circle
               cx="50"
               cy="50"
@@ -113,23 +113,23 @@ const FeeBreakdownChart: React.FC<FeeBreakdownChartProps> = ({ paidPercent, pend
           </svg>
           
           <div className="absolute inset-0 flex flex-col items-center justify-center">
-            <span className="text-2xl font-bold text-gray-900">{total.toFixed(1)}%</span>
-            <span className="text-sm text-gray-500">Total</span>
+            <span className="text-3xl font-bold text-gray-900">{total.toFixed(1)}%</span>
+            <span className="text-base text-gray-500">Total</span>
           </div>
         </div>
       </div>
 
-      <div className="space-y-2">
+      <div className="space-y-3">
         {data.map((item) => (
           <div key={item.label} className="flex items-center justify-between">
-            <div className="flex items-center space-x-2">
+            <div className="flex items-center space-x-3">
               <div 
-                className="w-3 h-3 rounded-full"
+                className="w-4 h-4 rounded-full"
                 style={{ backgroundColor: item.color }}
               ></div>
-              <span className="text-sm text-gray-600">{item.label}</span>
+              <span className="text-base text-gray-600">{item.label}</span>
             </div>
-            <span className="text-sm font-medium text-gray-900">{item.value.toFixed(1)}%</span>
+            <span className="text-base font-medium text-gray-900">{item.value.toFixed(1)}%</span>
           </div>
         ))}
       </div>
@@ -208,13 +208,8 @@ const Fees: React.FC = () => {
   };
 
   const formatAmount = (amount: number) => {
-    if (amount >= 100000) {
-      return `₹${(amount / 100000).toFixed(1)}L`;
-    }
-    if (amount >= 1000) {
-      return `₹${(amount / 1000).toFixed(0)}k`;
-    }
-    return `₹${amount}`;
+    if (!amount) return '₹0';
+    return `₹${amount.toLocaleString('en-IN')}`;
   };
 
   if (loading) {
@@ -247,7 +242,7 @@ const Fees: React.FC = () => {
   return (
     <div className="space-y-6 p-6">
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <StatsCard 
           title="Total Collected" 
           value={formatAmount(totalCollected)} 
@@ -287,8 +282,8 @@ const Fees: React.FC = () => {
               <table className="w-full">
                 <thead className="bg-gray-50">
                   <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Student ID</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Room No.</th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount</th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
@@ -298,21 +293,21 @@ const Fees: React.FC = () => {
                   {feeInfo.length > 0 ? (
                     feeInfo.map((row, index) => (
                       <tr key={index} className="hover:bg-gray-50 transition-colors">
-                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                          {row[0] || 'N/A'}
-                        </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                          {row[1] || '-'}
+                          {row[0] || '-'}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                          {row[1] || 'N/A'}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 font-medium">
-                          {row[2] ||'-'}
+                          {row[2] || '-'}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                          {row[3] ? formatAmount(row[2]) : '-'}
+                          {formatAmount(row[3])}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
                           <span className={getStatusBadge(row[4])}>
-                            {row[4] ? row[4].charAt(0).toUpperCase() + row[4].slice(1) : 'Unknown'}
+                            {row[4] ? row[4].charAt(0).toUpperCase() + row[4].slice(1).toLowerCase() : 'Unknown'}
                           </span>
                         </td>
                       </tr>
