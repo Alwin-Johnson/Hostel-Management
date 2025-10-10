@@ -86,7 +86,7 @@ export function AdminLogin({
       {/* Main Content - Centered */}
       <div className="relative z-10 max-w-lg w-full mx-auto">
         <Card className="bg-white/95 backdrop-blur-lg shadow-2xl border border-gray-100 rounded-3xl overflow-hidden">
-          <CardHeader className="text-center pb-8 bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900 text-white relative">
+          <CardHeader className="text-center pb-2 bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900 text-white relative">
             <div className="absolute inset-0 bg-[linear-gradient(45deg,transparent_25%,rgba(255,255,255,0.05)_50%,transparent_75%)] bg-[length:30px_30px] animate-pulse"></div>
             <div className="relative z-10">
               <div className="w-24 h-24 bg-white/10 backdrop-blur-sm rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-xl border border-white/20">
@@ -95,9 +95,6 @@ export function AdminLogin({
               <CardTitle className="text-3xl font-bold mb-3">
                 Admin Access
               </CardTitle>
-              <p className="text-blue-100 text-lg">
-                Secure authentication required
-              </p>
             </div>
           </CardHeader>
 
@@ -189,10 +186,6 @@ export function AdminLogin({
               <div className="text-center text-sm text-gray-500 pt-6 border-t border-gray-100">
                 <p className="font-medium">
                   Secure admin portal access
-                </p>
-                <p className="text-xs mt-2">
-                  All activities are logged and monitored for
-                  security
                 </p>
               </div>
             </form>
