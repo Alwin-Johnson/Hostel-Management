@@ -19,7 +19,7 @@ public class Rooms {
     private String roomType;
 
     @Column(name = "floor")
-    private Integer floor;
+    private String floor;
 
     @Column(name = "current_occupants", columnDefinition = "INT DEFAULT 0")
     private Integer currentOccupants = 0;
@@ -30,10 +30,15 @@ public class Rooms {
     @Column(name = "status", length = 20, columnDefinition = "VARCHAR(20) DEFAULT 'available'")
     private String status = "available";
 
+    @Column(name = "capacity", columnDefinition = "INT DEFAULT 0")
+    private Integer capacity = 0;
+
+
+
     // Constructors
     public Rooms() {}
 
-    public Rooms(String roomNo, String roomType, Integer floor, BigDecimal monthlyRent) {
+    public Rooms(String roomNo, String roomType, String floor, BigDecimal monthlyRent) {
         this.roomNo = roomNo;
         this.roomType = roomType;
         this.floor = floor;
@@ -67,11 +72,11 @@ public class Rooms {
         this.roomType = roomType;
     }
 
-    public Integer getFloor() {
+    public String getFloor() {
         return floor;
     }
 
-    public void setFloor(Integer floor) {
+    public void setFloor(String floor) {
         this.floor = floor;
     }
 
@@ -97,5 +102,12 @@ public class Rooms {
 
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    public Integer getCapacity() {
+        return capacity;
+    }
+    public void setCapacity(Integer capacity) {
+        this.capacity = capacity;
     }
 }
