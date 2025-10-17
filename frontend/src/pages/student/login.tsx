@@ -35,8 +35,6 @@ export const Login: React.FC<LoginProps> = ({ onLogin, onPageChange }) => {
       return;
     }
 
-    const student = await response.json();
-
     toast.success('Login successful! Redirecting...');
     setTimeout(() => {
       setIsLoading(false);

@@ -72,12 +72,12 @@ const FeeBreakdownChart: React.FC<FeeBreakdownChartProps> = ({ paidPercent, pend
   const total = data.reduce((sum, item) => sum + item.value, 0);
 
   return (
-    <div className="bg-white rounded-xl p-8 shadow-sm h-full flex flex-col">
-      <h3 className="text-lg font-semibold text-gray-900 mb-6">Fee Breakdown</h3>
+    <div className="bg-white rounded-xl p-6 shadow-sm flex flex-col" style={{ height: '400px' }}>
+      <h3 className="text-lg font-semibold text-gray-900 mb-4">Fee Breakdown</h3>
       
-      <div className="flex items-center justify-center mb-8 flex-grow">
-        <div className="relative w-52 h-52">
-          <svg className="w-52 h-52 transform -rotate-90" viewBox="0 0 100 100">
+      <div className="flex items-center justify-center mb-6 flex-grow">
+        <div className="relative w-48 h-48">
+          <svg className="w-48 h-48 transform -rotate-90" viewBox="0 0 100 100">
             <circle
               cx="50"
               cy="50"
@@ -271,16 +271,16 @@ const Fees: React.FC = () => {
         />
       </div>
 
-      {/* Main Content Grid */}
+{/* Main Content Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2">
-          <div className="bg-white rounded-xl shadow-sm">
+          <div className="bg-white rounded-xl shadow-sm flex flex-col" style={{ height: '600px' }}>
             <div className="p-6 border-b border-gray-200">
               <h2 className="text-lg font-semibold text-gray-900">Students Fee Information</h2>
             </div>
-            <div className="overflow-x-auto">
+            <div className="overflow-auto flex-1">
               <table className="w-full">
-                <thead className="bg-gray-50">
+                <thead className="bg-gray-50 sticky top-0 z-10">
                   <tr>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Student ID</th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
