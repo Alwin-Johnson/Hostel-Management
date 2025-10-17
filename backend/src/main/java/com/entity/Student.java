@@ -64,7 +64,7 @@ public class Student {
     private String parentContact;
     
     @Column(name = "room_id", length = 10 ,nullable = true)
-    private String roomId;
+    private Integer roomId;
     
     @Column(name = "admission_fee", columnDefinition = "BOOLEAN DEFAULT FALSE")
     private Boolean admissionFee = false;
@@ -207,11 +207,11 @@ public void setParentContact(String parentContact)
 { 
     this.parentContact = parentContact; 
 }
-public String getRoomId() 
+public Integer getRoomId() 
 { 
     return roomId; 
 }
-public void setRoomId(String roomId) 
+public void setRoomId(Integer roomId) 
 { 
     this.roomId = roomId; 
 }
