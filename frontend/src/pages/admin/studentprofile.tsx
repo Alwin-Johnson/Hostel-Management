@@ -30,7 +30,7 @@ interface Student {
   roomNo: string;
   block: string;
   admissionDate: string;
-  feeStatus: 'paid' | 'pending' | 'overdue';
+  feeStatus: 'paid' | 'pending';
   dueAmount: number;
   email?: string;
   phone?: string;
@@ -44,47 +44,13 @@ interface FeeRecord {
   invoiceId: string;
   date: string;
   amount: number;
-  status: 'paid' | 'pending' | 'overdue';
+  status: 'paid' | 'pending';
 }
 
 interface StudentProfileProps {
   student: Student;
   onBack: () => void;
 }
-
-// Sample data for demonstration with more realistic data showing skipped meals
-const sampleStudent: Student = {
-  messHistory: [
-    { date: '2025-01-01', breakfast: true, lunch: true, dinner: false, cost: 120 },
-    { date: '2025-01-02', breakfast: true, lunch: false, dinner: true, cost: 100 },
-    { date: '2025-01-03', breakfast: false, lunch: true, dinner: true, cost: 90 },
-    { date: '2025-01-04', breakfast: true, lunch: true, dinner: true, cost: 150 },
-    { date: '2025-01-05', breakfast: true, lunch: false, dinner: false, cost: 50 },
-    { date: '2025-01-06', breakfast: false, lunch: false, dinner: true, cost: 60 },
-    { date: '2025-01-07', breakfast: true, lunch: true, dinner: false, cost: 80 },
-    { date: '2025-01-08', breakfast: false, lunch: true, dinner: true, cost: 90 },
-    { date: '2025-01-09', breakfast: true, lunch: false, dinner: false, cost: 50 },
-    { date: '2025-01-10', breakfast: false, lunch: true, dinner: true, cost: 90 },
-  ],
-  id: '1',
-  avatar: 'JD',
-  name: 'John Doe',
-  studentId: 'ST001',
-  roomNo: 'A101',
-  block: 'ADMIN BLOCK',
-  admissionDate: '2023-01-15',
-  feeStatus: 'paid',
-  dueAmount: 0,
-  email: 'john.doe@example.com',
-  phone: '+91 9876543210',
-  dateOfBirth: '2000-05-15',
-  gender: 'Male',
-  mailingAddress: '123 Main St, Bangalore, KA 560001',
-  feeHistory: [
-    { invoiceId: 'fee1', date: '2023-01-10', amount: 50000, status: 'paid' },
-    { invoiceId: 'fee2', date: '2023-07-10', amount: 50000, status: 'paid' }
-  ]
-};
 
 const MessCalendar: React.FC<{ messHistory: MessHistoryRecord[] }> = ({ messHistory }) => {
   const [currentDate, setCurrentDate] = useState(new Date());
@@ -284,8 +250,6 @@ const StudentProfile: React.FC<StudentProfileProps> = ({ student, onBack }) => {
           return `${baseClasses} bg-green-100 text-green-700`;
         case 'pending':
           return `${baseClasses} bg-yellow-100 text-yellow-700`;
-        case 'overdue':
-          return `${baseClasses} bg-red-100 text-red-700`;
         default:
           return `${baseClasses} bg-gray-100 text-gray-700`;
       }
@@ -299,33 +263,44 @@ const StudentProfile: React.FC<StudentProfileProps> = ({ student, onBack }) => {
   };
 
   return (
-    <div className="space-y-6 max-w-6xl mx-auto p-6">
-      {/* Back Button */}
-      <button
-        onClick={onBack}
-        className="flex items-center space-x-2 text-blue-600 hover:text-blue-700 transition-colors"
-      >
-        <ArrowLeft className="w-4 h-4" />
-        <span>Back to Student List</span>
-      </button>
-
-      {/* Header Section */}
-      <div className="flex items-center space-x-4">
-        <div className="w-20 h-20 bg-blue-100 rounded-full flex items-center justify-center">
-          <span className="text-2xl font-bold text-blue-700">{student.avatar}</span>
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50 to-indigo-50">
+      <div className="max-w-7xl mx-auto p-4 sm:p-6 lg:p-8">
+        {/* Back Button */}
+        <div className="mb-6">
+          <button
+            onClick={onBack}
+            className="flex items-center space-x-2 px-4 py-2 text-blue-600 hover:text-blue-700 hover:bg-white/60 rounded-lg transition-all duration-200 backdrop-blur-sm"
+          >
+            <ArrowLeft className="w-5 h-5" />
+            <span className="font-medium">Back to Student List</span>
+          </button>
         </div>
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900">{student.name}</h1>
-          <p className="text-gray-500">Student ID: {student.studentId}</p>
-        </div>
-      </div>
 
-      {/* Content Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Header Section - Enhanced */}
+        <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-6 sm:p-8 mb-6">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center space-y-4 sm:space-y-0 sm:space-x-6">
+            <div className="w-24 h-24 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-2xl flex items-center justify-center shadow-lg transform hover:scale-105 transition-transform duration-200">
+              <span className="text-3xl font-bold text-white">{student.avatar}</span>
+            </div>
+            <div className="flex-1">
+              <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-2">{student.name}</h1>
+              <div className="flex flex-wrap items-center gap-4">
+                <p className="text-gray-600 font-medium">ID: {student.studentId}</p>
+                <span className="text-gray-300">|</span>
+                <p className="text-gray-600 font-medium">Room {student.roomNo}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Content Grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
         {/* Personal Information */}
-        <div className="bg-white rounded-lg border border-gray-200 p-6">
-          <h2 className="text-xl font-semibold text-gray-900 mb-4 flex items-center">
-            <User className="w-5 h-5 mr-2" />
+        <div className="bg-white rounded-2xl shadow-md border border-gray-100 p-6 hover:shadow-xl transition-shadow duration-300">
+          <h2 className="text-xl font-semibold text-gray-900 mb-5 flex items-center">
+            <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center mr-3">
+              <User className="w-5 h-5 text-blue-600" />
+            </div>
             Personal Information
           </h2>
           <div className="space-y-4">
@@ -349,9 +324,11 @@ const StudentProfile: React.FC<StudentProfileProps> = ({ student, onBack }) => {
         </div>
 
         {/* Contact Information */}
-        <div className="bg-white rounded-lg border border-gray-200 p-6">
-          <h2 className="text-xl font-semibold text-gray-900 mb-4 flex items-center">
-            <Phone className="w-5 h-5 mr-2" />
+        <div className="bg-white rounded-2xl shadow-md border border-gray-100 p-6 hover:shadow-xl transition-shadow duration-300">
+          <h2 className="text-xl font-semibold text-gray-900 mb-5 flex items-center">
+            <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center mr-3">
+              <Phone className="w-5 h-5 text-green-600" />
+            </div>
             Contact Information
           </h2>
           <div className="space-y-4">
@@ -380,9 +357,11 @@ const StudentProfile: React.FC<StudentProfileProps> = ({ student, onBack }) => {
         </div>
 
         {/* Academic Information */}
-        <div className="bg-white rounded-lg border border-gray-200 p-6">
-          <h2 className="text-xl font-semibold text-gray-900 mb-4 flex items-center">
-            <GraduationCap className="w-5 h-5 mr-2" />
+        <div className="bg-white rounded-2xl shadow-md border border-gray-100 p-6 hover:shadow-xl transition-shadow duration-300">
+          <h2 className="text-xl font-semibold text-gray-900 mb-5 flex items-center">
+            <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center mr-3">
+              <GraduationCap className="w-5 h-5 text-purple-600" />
+            </div>
             Academic Information
           </h2>
           <div className="space-y-4">
@@ -395,10 +374,6 @@ const StudentProfile: React.FC<StudentProfileProps> = ({ student, onBack }) => {
                 </p>
               </div>
               <div>
-                <label className="block text-sm text-gray-500 mb-1">Block</label>
-                <p className="font-medium text-gray-900">{student.block}</p>
-              </div>
-              <div>
                 <label className="block text-sm text-gray-500 mb-1">Room Number</label>
                 <p className="font-medium text-gray-900">{student.roomNo}</p>
               </div>
@@ -407,9 +382,11 @@ const StudentProfile: React.FC<StudentProfileProps> = ({ student, onBack }) => {
         </div>
 
         {/* Mess Details */}
-        <div className="bg-white rounded-lg border border-gray-200 p-6">
-          <h2 className="text-xl font-semibold text-gray-900 mb-4 flex items-center">
-            <Utensils className="w-5 h-5 mr-2" />
+        <div className="bg-white rounded-2xl shadow-md border border-gray-100 p-6 hover:shadow-xl transition-shadow duration-300">
+          <h2 className="text-xl font-semibold text-gray-900 mb-5 flex items-center">
+            <div className="w-10 h-10 bg-orange-100 rounded-lg flex items-center justify-center mr-3">
+              <Utensils className="w-5 h-5 text-orange-600" />
+            </div>
             Mess Details
           </h2>
           <div className="space-y-4">
@@ -447,18 +424,22 @@ const StudentProfile: React.FC<StudentProfileProps> = ({ student, onBack }) => {
       </div>
 
       {/* Mess Calendar - Full Width */}
-      <div className="bg-white rounded-lg border border-gray-200 p-6">
-        <h2 className="text-xl font-semibold text-gray-900 mb-4 flex items-center">
-          <Calendar className="w-5 h-5 mr-2" />
+      <div className="bg-white rounded-2xl shadow-md border border-gray-100 p-6 hover:shadow-xl transition-shadow duration-300 mb-6">
+        <h2 className="text-xl font-semibold text-gray-900 mb-5 flex items-center">
+          <div className="w-10 h-10 bg-indigo-100 rounded-lg flex items-center justify-center mr-3">
+            <Calendar className="w-5 h-5 text-indigo-600" />
+          </div>
           Mess Calendar
         </h2>
         <MessCalendar messHistory={student.messHistory || []} />
       </div>
 
       {/* Fee History */}
-      <div className="bg-white rounded-lg border border-gray-200 p-6">
-        <h2 className="text-xl font-semibold text-gray-900 mb-4 flex items-center">
-          <CreditCard className="w-5 h-5 mr-2" />
+      <div className="bg-white rounded-2xl shadow-md border border-gray-100 p-6 hover:shadow-xl transition-shadow duration-300">
+        <h2 className="text-xl font-semibold text-gray-900 mb-5 flex items-center">
+          <div className="w-10 h-10 bg-teal-100 rounded-lg flex items-center justify-center mr-3">
+            <CreditCard className="w-5 h-5 text-teal-600" />
+          </div>
           Fee History
         </h2>
         <div className="space-y-3">
@@ -492,20 +473,9 @@ const StudentProfile: React.FC<StudentProfileProps> = ({ student, onBack }) => {
           )}
         </div>
       </div>
+      </div>
     </div>
   );
 };
 
-// Demo App Component
-const App = () => {
-  return (
-    <div className="min-h-screen bg-gray-50">
-      <StudentProfile 
-        student={sampleStudent} 
-        onBack={() => console.log('Going back to student list')} 
-      />
-    </div>
-  );
-};
-
-export default App;
+export default StudentProfile;
