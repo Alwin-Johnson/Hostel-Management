@@ -33,34 +33,33 @@ export function AdminLogin({
   });
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
+
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+    setErrorMessage('');
 
     if (!loginData.userId || !loginData.password) {
-      toast.error("Please fill in all required fields");
+      setErrorMessage('Please fill in all required fields');
+      toast.error('Please fill in all required fields');
       return;
     }
 
     setIsLoading(true);
 
-    // Simulate API call
     setTimeout(() => {
-      // Mock authentication - in real app, this would be an API call
-      if (
-        loginData.userId === "admin" &&
-        loginData.password === "admin123"
-      ) {
-        toast.success(
-          "Login successful! Welcome to Admin Dashboard",
-        );
-        onLogin(); // This will trigger navigation in the parent component
+      if (loginData.userId === 'admin' && loginData.password === 'admin123') {
+        toast.success('Login successful! Welcome to Admin Dashboard');
+        onLogin();
       } else {
-        toast.error("Invalid credentials. Please try again.");
+        setErrorMessage('Invalid credentials. Please try again.');
+        toast.error('Invalid credentials. Please try again.');
       }
       setIsLoading(false);
     }, 1500);
   };
+
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 relative overflow-hidden flex items-center justify-center p-4">
@@ -99,6 +98,12 @@ export function AdminLogin({
           </CardHeader>
 
           <CardContent className="p-10">
+            {errorMessage && (
+              <div className="mb-4 p-3 bg-red-100 text-red-700 rounded">
+                {errorMessage}
+              </div>
+            )}
+            
             <form onSubmit={handleLogin} className="space-y-6">
               <div className="space-y-3">
                 <label

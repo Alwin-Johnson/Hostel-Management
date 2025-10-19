@@ -53,7 +53,13 @@ public interface StudentRepository extends JpaRepository<Student, Integer> {
     @Query(value = "SELECT * FROM Student WHERE room_id = ?1", nativeQuery = true)
     List<Student> findStudentsByRoom(Integer roomId);
     
-    // ===== UPDATE OPERATIONS =====
+
+    @Query(value = "SELECT s.student_id, s.name, s.college_id, s.gender, s.dob, s.admission_date, s.email, s.contact_no, s.parent_name, s.parent_contact, s.guardian_name, s.guardian_contact, s.address, s.course, s.stream, s.year, r.room_no, r.floor,r.monthly_rent FROM Student s LEFT JOIN Rooms r ON s.room_id = r.room_id WHERE s.student_id = ?1", nativeQuery = true)
+    Optional<Object[]> getPersonalDataByStudentById(Integer studentId);
+
+@Query(value = "SELECT s2.name FROM Student s1 JOIN Student s2 ON s1.room_id = s2.room_id WHERE s1.student_id = ?1 AND s2.student_id != ?1 AND s1.room_id IS NOT NULL", nativeQuery = true)
+List<String> findRoommatesByStudentId(Integer studentId);
+
     @Modifying
     @Query(value = "UPDATE Student SET admission_fee = ?1 WHERE student_id = ?2", nativeQuery = true)
     int updateAdmissionFee(Boolean admissionFee, Integer studentId);

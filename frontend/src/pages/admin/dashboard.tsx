@@ -113,7 +113,7 @@ const LineChartCard: React.FC<LineChartCardProps> = ({ title }) => {
   };
 
   return (
-    <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+    <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 h-full flex flex-col">
       <div className="flex items-center justify-between mb-6">
         <h3 className="text-lg font-semibold text-gray-900">{title}</h3>
         
@@ -135,7 +135,7 @@ const LineChartCard: React.FC<LineChartCardProps> = ({ title }) => {
         </div>
       </div>
       
-      <div className="h-80">
+      <div className="flex-1">
         <ResponsiveContainer width="100%" height="100%">
           <LineChart data={mealData[selectedMeal as keyof typeof mealData]}>
             <CartesianGrid strokeDasharray="3 3" />
@@ -204,28 +204,28 @@ const Dashboard: React.FC = () => {
     {
       title: "Total Students",
       value: "2,600",
-      bgColor: "#4F46E5", // Blue gradient
+      bgColor: "#4F46E5",
       icon: <Users className="w-5 h-5" />,
       trend: "↗"
     },
     {
       title: "Fee Collection %",
       value: "85%",
-      bgColor: "#10B981", // Green gradient
+      bgColor: "#10B981",
       icon: <CheckCircle className="w-5 h-5" />,
       trend: "↗"
     },
     {
       title: "Pending Fees",
       value: "₹1.2L",
-      bgColor: "#F59E0B", // Orange gradient
+      bgColor: "#F59E0B",
       icon: <AlertTriangle className="w-5 h-5" />,
       trend: "↓"
     },
     {
       title: "Active Complaints",
       value: "23",
-      bgColor: "#EF4444", // Red gradient
+      bgColor: "#EF4444",
       icon: <AlertTriangle className="w-5 h-5" />,
       trend: "!"
     }
@@ -250,7 +250,7 @@ const Dashboard: React.FC = () => {
   return (
     <div className="p-6 bg-gray-50 min-h-screen">
       {/* Stats Cards Row */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
         {statsData.map((stat, index) => (
           <StatsCard
             key={index}
@@ -263,23 +263,16 @@ const Dashboard: React.FC = () => {
         ))}
       </div>
 
-      {/* Main Content Grid - Chart in center */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 mb-8">
-        {/* Line Chart - Takes up 8 columns on large screens and centered */}
-        <div className="lg:col-span-8 lg:col-start-3">
+      {/* Main Content Section - Chart on Left, Cards on Right */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Chart takes 2 columns */}
+        <div className="lg:col-span-2">
           <LineChartCard title="Skipped Meals Trends" />
         </div>
-      </div>
 
-      {/* Bottom Section */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-        {/* Recent Admissions - Left side */}
-        <div>
+        {/* Right side cards stack vertically */}
+        <div className="space-y-6">
           <ListCard title="Recent Admissions" items={recentAdmissions} />
-        </div>
-
-        {/* Recent Complaints - Right side */}
-        <div>
           <ListCard title="Recent Complaints" items={recentComplaints} />
         </div>
       </div>

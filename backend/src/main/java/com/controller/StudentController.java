@@ -8,6 +8,8 @@ import com.service.StudentService;
 
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -18,6 +20,7 @@ import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
 
 
 @CrossOrigin(origins = "*") // Add this line
@@ -190,9 +193,50 @@ public ResponseEntity<?> getStudentRoomFeeInfo() {
                 .body("Failed to retrieve data: " + e.getMessage());
     }
 }
-
-
-
-
-
+@GetMapping("/Admin/studentProfile/personalAndRoomData")
+public ResponseEntity<?> getPersonalAndRoomData(@RequestParam Integer studentId) {
+    try {
+        if (studentId == null || studentId <= 0) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body("Invalid student ID. Must be a positive integer.");
+        }
+        
+        Object[] student = studentService.getPersonalDataByStudentById(studentId);
+        if (student == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body("Student not found with ID: " + studentId);
+        }
+        return ResponseEntity.ok(student);
+    } catch (Exception e) {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body("Failed to retrieve data: " + e.getMessage());
+    }
 }
+@GetMapping("/Admin/studentProfile/roommates")
+public ResponseEntity<List<String>> getRoommates(@RequestParam Integer studentId) {
+    System.out.println("=== CONTROLLER: Received request for studentId: " + studentId);
+    try {
+        if (studentId == null || studentId <= 0) {
+            System.out.println("=== Invalid studentId");
+            return ResponseEntity.badRequest().build();
+        }
+        
+        List<String> roommates = studentService.findRoommatesByStudentId(studentId);
+        System.out.println("=== CONTROLLER: Roommates found: " + roommates);
+        
+        if (roommates == null) {
+            roommates = new ArrayList<>();
+        }
+        
+        return ResponseEntity.ok(roommates);
+    } catch (Exception e) {
+        System.out.println("=== ERROR: " + e.getMessage());
+        e.printStackTrace();
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+    }
+}
+}
+
+
+
+

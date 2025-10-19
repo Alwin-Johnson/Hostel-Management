@@ -18,21 +18,21 @@ public class MessSkipping {
     @Column(name="date", nullable=false)
     private LocalDate date;
 
-    @Enumerated(EnumType.STRING)
+    
     @Column(name="meal_type", nullable=false, length=10)
-    private MealType mealType;
+    private String meal_type;
 
     @Column(name="skipped", nullable=false)
     private Boolean skipped;
 
-    public enum MealType { BREAKFAST, LUNCH, DINNER }
+    
 
     public MessSkipping() {}
 
-    public MessSkipping(Integer studentId, LocalDate date, MealType mealType, Boolean skipped) {
+    public MessSkipping(Integer studentId, LocalDate date, String meal_type, Boolean skipped) {
         this.studentId = studentId;
         this.date = date;
-        this.mealType = mealType;
+        this.meal_type = meal_type;
         this.skipped = skipped;
     }
 
@@ -60,12 +60,12 @@ public class MessSkipping {
         this.date = date;
     }
 
-    public MealType getMealType() {
-        return mealType;
+    public String getMealType() {
+        return meal_type;
     }
 
-    public void setMealType(MealType mealType) {
-        this.mealType = mealType;
+    public void setMealType(String mealType) {
+        this.meal_type = mealType;
     }
 
     public Boolean getSkipped() {
