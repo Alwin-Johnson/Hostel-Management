@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Card, CardHeader, CardTitle, CardContent } from '../../components/student/card';
 import { Clock, Utensils, Scissors, Plus, CalendarX } from 'lucide-react';
 import { Button } from '../../components/student/button';

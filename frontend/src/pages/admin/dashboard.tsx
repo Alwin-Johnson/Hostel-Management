@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { TrendingUp, Users, AlertTriangle, CheckCircle, Star } from 'lucide-react';
+import { TrendingUp, Users, AlertTriangle, CheckCircle } from 'lucide-react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
 // Enhanced StatsCard component with hover animation
@@ -15,8 +15,7 @@ interface StatsCardProps {
 const StatsCard: React.FC<StatsCardProps> = ({ 
   title, 
   value, 
-  bgColor, 
-  textColor = "white",
+  bgColor,
   icon,
   trend
 }) => {

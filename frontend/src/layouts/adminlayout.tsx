@@ -6,7 +6,6 @@ import {
   DollarSign, 
   Utensils, 
   User,
-  ChevronDown
 } from 'lucide-react';
 
 interface AdminLayoutProps {

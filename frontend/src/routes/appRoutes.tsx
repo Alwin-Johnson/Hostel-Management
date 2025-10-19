@@ -24,7 +24,6 @@ import { Login as StudentLogin } from '../pages/student/login';
 import { NewAdmission } from '../pages/student/newadmission';
 import { AdmissionContinuation } from '../pages/student/newadmissioncontinuation';
 import StudentFees from '../pages/student/fees';
-import { StudentAttendance } from '../pages/student/attendance';
 import { StudentMess } from '../pages/student/mess';
 import { StudentComplaints } from '../pages/student/complaints';
 import StudentProfile from '../pages/student/profile';
@@ -135,17 +134,6 @@ const AppRoutes: React.FC = () => {
           <ProtectedRoute isAuthenticated={isStudentAuthenticated} redirectPath="/student/login">
             <StudentLayout onLogout={handleStudentLogout}>
               <StudentFees />
-            </StudentLayout>
-          </ProtectedRoute>
-        }
-      />
-
-      <Route
-        path="/student/attendance"
-        element={
-          <ProtectedRoute isAuthenticated={isStudentAuthenticated} redirectPath="/student/login">
-            <StudentLayout onLogout={handleStudentLogout}>
-              <StudentAttendance />
             </StudentLayout>
           </ProtectedRoute>
         }
