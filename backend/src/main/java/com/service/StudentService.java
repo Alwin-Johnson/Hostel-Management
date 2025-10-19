@@ -87,10 +87,16 @@ public List<Object[]> findStudentRoomFeeInfo() {
 }
 
 
+public Object[] getPersonalDataByStudentById(Integer studentId) {
+    return studentRepository.getPersonalDataByStudentById(studentId).orElse(null);
+}
 
-
-
-
+public List<String> findRoommatesByStudentId(Integer studentId) {
+    System.out.println("Finding roommates for student ID: " + studentId);
+    List<String> roommates = studentRepository.findRoommatesByStudentId(studentId);
+    System.out.println("Found roommates: " + roommates);
+    return roommates;
+}
 
     // ===== UTILITY METHODS =====
     public Student findByEmail(String email) {

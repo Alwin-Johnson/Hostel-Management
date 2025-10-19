@@ -338,14 +338,9 @@ const Mess = () => {
                   />
                 </div>
                 
-                {/* Filter */}
-                <button className="flex items-center space-x-2 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors">
-                  <Filter className="w-4 h-4" />
-                  <span>Filter</span>
-                </button>
               </div>
             </div>
-          </div>
+          </div>  
 
           <div className="overflow-x-auto">
             <table className="w-full">
