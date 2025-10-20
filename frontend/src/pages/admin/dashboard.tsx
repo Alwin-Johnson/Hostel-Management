@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { TrendingUp, Users, AlertTriangle, CheckCircle, Star } from 'lucide-react';
+import { TrendingUp, Users, AlertTriangle, CheckCircle } from 'lucide-react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
 // Enhanced StatsCard component with hover animation
@@ -15,8 +15,7 @@ interface StatsCardProps {
 const StatsCard: React.FC<StatsCardProps> = ({ 
   title, 
   value, 
-  bgColor, 
-  textColor = "white",
+  bgColor,
   icon,
   trend
 }) => {
@@ -210,29 +209,29 @@ const Dashboard: React.FC = () => {
     },
     {
       title: "Fee Collection %",
-      value: "85%",
+      value: "38%",
       bgColor: "#10B981",
       icon: <CheckCircle className="w-5 h-5" />,
       trend: "↗"
     },
     {
       title: "Pending Fees",
-      value: "₹1.2L",
+      value: "₹31,000",
       bgColor: "#F59E0B",
       icon: <AlertTriangle className="w-5 h-5" />,
       trend: "↓"
     },
     {
       title: "Active Complaints",
-      value: "23",
+      value: "10",
       bgColor: "#EF4444",
       icon: <AlertTriangle className="w-5 h-5" />,
       trend: "!"
     }
   ];
 
-  // Mock data for recent admissions
-  const recentAdmissions = [
+  // Mock data for quick stats
+  const quickStats = [
     { label: "New Admissions", value: 156, sublabel: "This month" },
     { label: "Pending Applications", value: 89, sublabel: "Awaiting approval" },
     { label: "Total Capacity", value: 500, sublabel: "Available rooms" },
@@ -272,7 +271,7 @@ const Dashboard: React.FC = () => {
 
         {/* Right side cards stack vertically */}
         <div className="space-y-6">
-          <ListCard title="Recent Admissions" items={recentAdmissions} />
+          <ListCard title="Quick Stats" items={quickStats} />
           <ListCard title="Recent Complaints" items={recentComplaints} />
         </div>
       </div>

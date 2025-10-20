@@ -1,4 +1,3 @@
-import React from "react";
 import { Card, CardHeader, CardTitle, CardContent } from "../../components/student/card";
 import { Button } from "../../components/student/button";
 import { Badge } from "../../components/student/badge";

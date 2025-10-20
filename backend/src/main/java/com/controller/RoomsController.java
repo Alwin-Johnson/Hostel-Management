@@ -1,6 +1,5 @@
 package com.controller;
 
-import com.entity.Rooms;
 import com.service.RoomsService;
 
 import java.util.Map;

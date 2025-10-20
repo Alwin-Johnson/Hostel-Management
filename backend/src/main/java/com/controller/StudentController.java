@@ -9,7 +9,6 @@ import com.service.StudentService;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -28,7 +27,6 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/students")
 public class StudentController {
     
-    private static final Integer Integer = null;
     private final StudentService studentService;
     
     public StudentController(StudentService studentService) {

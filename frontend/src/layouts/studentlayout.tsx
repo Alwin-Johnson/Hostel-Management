@@ -2,7 +2,6 @@ import React from "react";
 import { Link, useLocation } from "react-router-dom";
 import { 
   Home,
-  CalendarCheck,
   Utensils,
   DollarSign,
   User,
@@ -20,7 +19,6 @@ const StudentLayout: React.FC<StudentLayoutProps> = ({ children, pageTitle = "St
 
   const navItems = [
     { path: "/student/dashboard", label: "Dashboard", icon: Home },
-    { path: "/student/attendance", label: "Attendance", icon: CalendarCheck },
     { path: "/student/mess", label: "Mess", icon: Utensils },
     { path: "/student/fees", label: "Fees", icon: DollarSign },
     { path: "/student/complaints", label: "Complaints", icon: User },

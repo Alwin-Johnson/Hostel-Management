@@ -4,7 +4,6 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
-import com.entity.Rooms;
 import com.repository.RoomsRepository;
 import jakarta.transaction.Transactional;
 

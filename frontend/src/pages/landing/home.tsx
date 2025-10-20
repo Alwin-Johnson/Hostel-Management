@@ -1,6 +1,6 @@
 import { Button } from "../../components/admin/button";
 import { Card, CardContent } from "../../components/admin/card";
-import { Bell, Mail, Phone, MapPin, Users, Shield, ArrowRight, Star, Wifi, Car, Coffee, Zap, Award, Heart} from 'lucide-react';
+import { Mail, Phone, MapPin, Users, Shield, ArrowRight, Star, Wifi, Car, Coffee, Heart} from 'lucide-react';
 import { ImageWithFallback } from '../../assests/ImageWithFallback';
 interface LandingPageProps {
   onPageChange: (target: 'admin' | 'student') => void;
@@ -20,7 +20,7 @@ export function LandingPage({ onPageChange }: LandingPageProps) {
               <div></div>
               <div>
                 <h1 className="text-xl font-bold bg-gradient-to-r from-gray-800 to-blue-600 bg-clip-text text-transparent">Campus Hostel</h1>
-                <p className="text-xs text-gray-500">Management System</p>
+                <p className="text-xs text-gray-500">Automation</p>
               </div>
             </div>
             
@@ -350,7 +350,7 @@ export function LandingPage({ onPageChange }: LandingPageProps) {
             </div>
             
             <div className="text-center lg:text-right">
-              <p className="text-gray-400">&copy; 2024 Campus Hostel Management</p>
+              <p className="text-gray-400">&copy; 2025 Campus Hostel Automation</p>
               <p className="text-gray-500 text-sm">Your comfort and success is our priority</p>
             </div>
           </div>
