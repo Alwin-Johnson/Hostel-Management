@@ -26,7 +26,6 @@ import { AdmissionContinuation } from '../pages/student/newadmissioncontinuation
 import StudentFees from '../pages/student/fees';
 import { StudentMess } from '../pages/student/mess';
 import { StudentComplaints } from '../pages/student/complaints';
-import StudentProfile from '../pages/student/profile';
 
 // ----------------------
 // Protected Route
@@ -110,19 +109,8 @@ const AppRoutes: React.FC = () => {
         path="/student/dashboard"
         element={
           <ProtectedRoute isAuthenticated={isStudentAuthenticated} redirectPath="/student/login">
-            <StudentLayout onLogout={handleStudentLogout}>
+            <StudentLayout pageTitle="Dashboard" onLogout={handleStudentLogout}>
               <OverviewTab />
-            </StudentLayout>
-          </ProtectedRoute>
-        }
-      />
-
-      <Route
-        path="/student/profile"
-        element={
-          <ProtectedRoute isAuthenticated={isStudentAuthenticated} redirectPath="/student/login">
-            <StudentLayout onLogout={handleStudentLogout}>
-              <StudentProfile />
             </StudentLayout>
           </ProtectedRoute>
         }
@@ -132,7 +120,7 @@ const AppRoutes: React.FC = () => {
         path="/student/fees"
         element={
           <ProtectedRoute isAuthenticated={isStudentAuthenticated} redirectPath="/student/login">
-            <StudentLayout onLogout={handleStudentLogout}>
+            <StudentLayout pageTitle="Fee Details" onLogout={handleStudentLogout}>
               <StudentFees />
             </StudentLayout>
           </ProtectedRoute>
@@ -143,7 +131,7 @@ const AppRoutes: React.FC = () => {
         path="/student/mess"
         element={
           <ProtectedRoute isAuthenticated={isStudentAuthenticated} redirectPath="/student/login">
-            <StudentLayout onLogout={handleStudentLogout}>
+            <StudentLayout pageTitle="Mess Details" onLogout={handleStudentLogout}>
               <StudentMess />
             </StudentLayout>
           </ProtectedRoute>
@@ -154,7 +142,7 @@ const AppRoutes: React.FC = () => {
         path="/student/complaints"
         element={
           <ProtectedRoute isAuthenticated={isStudentAuthenticated} redirectPath="/student/login">
-            <StudentLayout onLogout={handleStudentLogout}>
+            <StudentLayout pageTitle="Complaints" onLogout={handleStudentLogout}>
               <StudentComplaints />
             </StudentLayout>
           </ProtectedRoute>
@@ -221,7 +209,7 @@ const AppRoutes: React.FC = () => {
         path="/admin/complaints"
         element={
           <ProtectedRoute isAuthenticated={isAdminAuthenticated}>
-            <AdminLayout pageTitle="Notice & Complaints" onLogout={handleAdminLogout}>
+            <AdminLayout pageTitle="Complaints" onLogout={handleAdminLogout}>
               <Complaints />
             </AdminLayout>
           </ProtectedRoute>

@@ -6,6 +6,7 @@ import {
   DollarSign, 
   Utensils, 
   User,
+  MessageSquare
 } from 'lucide-react';
 
 interface AdminLayoutProps {
@@ -22,6 +23,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children, pageTitle = "Admin 
     { path: '/admin/students', label: 'Students', icon: Users },
     { path: '/admin/fees', label: 'Fees', icon: DollarSign },
     { path: '/admin/mess', label: 'Mess', icon: Utensils },
+    { path: '/admin/complaints', label: 'Complaints', icon: MessageSquare },
   ];
 
   const isActive = (path: string) => location.pathname === path;

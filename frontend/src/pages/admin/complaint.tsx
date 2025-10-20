@@ -2,11 +2,6 @@ import { useState, useEffect } from 'react';
 
 export default function HostelManagement() {
   const [complaints, setComplaints] = useState<any[]>([]);
-  const [notices, setNotices] = useState<any[]>([]);
-  const [noticeForm, setNoticeForm] = useState({
-    title: '',
-    content: ''
-  });
 
   // Sample complaints data
   useEffect(() => {
@@ -67,41 +62,9 @@ export default function HostelManagement() {
       }
     ];
 
-    const sampleNotice = {
-      id: 1,
-      title: "Mess Timing Update",
-      content: "Please note that the mess timings have been updated. Breakfast: 7:00 AM - 10:00 AM, Lunch: 12:00 PM - 2:00 PM, Dinner: 7:00 PM - 9:00 PM. Please adhere to these timings.",
-      date: new Date().toLocaleDateString()
-    };
-
     setComplaints(sampleComplaints);
-    setNotices([sampleNotice]);
   }, []);
 
-  const handleNoticeSubmit = () => {
-    if (!noticeForm.title || !noticeForm.content) {
-      alert('Please fill in all fields');
-      return;
-    }
-
-    const newNotice = {
-      id: Date.now(),
-      title: noticeForm.title,
-      content: noticeForm.content,
-      date: new Date().toLocaleDateString()
-    };
-
-    setNotices([...notices, newNotice]);
-    setNoticeForm({ title: '', content: '' });
-    alert('Notice posted successfully!');
-  };
-
-  const handleNoticeChange = (field: string, value: string) => {
-    setNoticeForm(prev => ({
-      ...prev,
-      [field]: value
-    }));
-  };
 
   const toggleComplaintStatus = (complaintId: number) => {
     const complaint = complaints.find(c => c.id === complaintId);
@@ -125,8 +88,8 @@ export default function HostelManagement() {
   };
 
   // Group complaints by category
-  const groupComplaintsByCategory = () => {
-    const categories: any = {
+  const groupComplaintsByCategory = (): Record<string, any[]> => {
+    const categories: Record<string, any[]> = {
       'Room Issue': [],
       'Food Quality': [],
       'Cleaning': []
@@ -196,121 +159,17 @@ export default function HostelManagement() {
     </div>
   );
 
-  const NoticeCard = ({ notice }: { notice: any }) => (
-    <div className="bg-gradient-to-r from-yellow-50 to-yellow-100 border-2 border-yellow-400 rounded-xl p-6 mb-4">
-      <div className="font-semibold text-yellow-800 mb-3 text-lg">
-        {notice.title}
-      </div>
-      <div className="text-yellow-900 mb-3 leading-relaxed">
-        {notice.content}
-      </div>
-      <div className="text-sm text-yellow-700 italic">
-        Posted on: {notice.date}
-      </div>
-    </div>
-  );
-
-  const EmptyState = ({ message }: { message: string }) => (
-    <div className="text-center text-gray-500 py-12">
-      <p className="text-lg">{message}</p>
-    </div>
-  );
-
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Main Container */}
-      <div className="max-w-7xl mx-auto p-6">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          
-          {/* Submitted Complaints Section */}
-          <div className="bg-white rounded-xl shadow-lg overflow-hidden lg:col-span-2">
-            <div className="bg-indigo-600 text-white p-5">
-              <h2 className="text-xl font-semibold">Submitted Complaints</h2>
-            </div>
-            <div className="p-6">
-              {complaints.length === 0 ? (
-                <EmptyState 
-                  message="No complaints submitted yet" 
-                />
-              ) : (
-                <div>
-                  {Object.entries(groupComplaintsByCategory()).map(([category, categoryComplaints]) => {
-                    return (
-                      <CategorySection
-                        key={category}
-                        title={category}
-                        complaints={categoryComplaints as any[]}
-                      />
-                    );
-                  })}
-                </div>
-              )}
-            </div>
-          </div>
-
-          {/* Notice Creation Section */}
-          <div className="bg-white rounded-xl shadow-lg overflow-hidden">
-            <div className="bg-indigo-600 text-white p-5">
-              <h2 className="text-xl font-semibold">Create Notice</h2>
-            </div>
-            <div className="p-6">
-              <div className="space-y-5">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Notice Title
-                  </label>
-                  <input
-                    type="text"
-                    value={noticeForm.title}
-                    onChange={(e) => handleNoticeChange('title', e.target.value)}
-                    className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-indigo-500 focus:outline-none transition-colors text-gray-900"
-                    placeholder="e.g., Important Announcement"
-                  />
-                </div>
-                
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Notice Content
-                  </label>
-                  <textarea
-                    value={noticeForm.content}
-                    onChange={(e) => handleNoticeChange('content', e.target.value)}
-                    className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-indigo-500 focus:outline-none transition-colors resize-vertical min-h-32 text-gray-900"
-                    placeholder="Write your notice here..."
-                  />
-                </div>
-                
-                <button
-                  onClick={handleNoticeSubmit}
-                  className="w-full bg-gradient-to-r from-green-500 to-green-600 text-white py-3 px-6 rounded-lg font-medium hover:from-green-600 hover:to-green-700 transform hover:-translate-y-0.5 transition-all duration-200 shadow-md hover:shadow-lg"
-                >
-                  Post Notice
-                </button>
-              </div>
-            </div>
-          </div>
-
-          {/* Posted Notices Section */}
-          <div className="bg-white rounded-xl shadow-lg overflow-hidden lg:col-span-2">
-            <div className="bg-indigo-600 text-white p-5">
-              <h2 className="text-xl font-semibold">Posted Notices</h2>
-            </div>
-            <div className="p-6">
-              {notices.length === 0 ? (
-                <EmptyState 
-                  message="No notices posted yet" 
-                />
-              ) : (
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                  {notices.map(notice => (
-                    <NoticeCard key={notice.id} notice={notice} />
-                  ))}
-                </div>
-              )}
-            </div>
-          </div>
+    <div className="min-h-screen bg-gray-50 p-6">
+        <div className="space-y-10">
+          {Object.entries(groupComplaintsByCategory()).map(([category, categoryComplaints]) => (
+            <CategorySection
+              key={category}
+              title={category}
+              complaints={categoryComplaints}
+            />
+          ))}
         </div>
-      </div>
     </div>
   );
 }

@@ -30,29 +30,26 @@ export function StudentMess() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
 
         {/* Meal Timings */}
-        <Card className="bg-gradient-to-br from-white to-yellow-50 border-yellow-200 shadow-xl">
-          <CardHeader>
-            <CardTitle className="flex items-center space-x-2">
-              <Clock className="w-5 h-5 text-yellow-600" />
-              <span>Meal Timings</span>
+        <Card className="bg-white border border-gray-200 shadow-sm">
+          <CardHeader className="border-b border-gray-100 bg-gradient-to-r from-blue-50 to-purple-50">
+            <CardTitle className="flex items-center space-x-2 text-gray-800">
+              <div className="w-8 h-8 rounded-lg bg-blue-500 flex items-center justify-center">
+                <Clock className="w-4 h-4 text-white" />
+              </div>
+              <span className="text-lg font-semibold">Meal Timings</span>
             </CardTitle>
           </CardHeader>
-          <CardContent className="space-y-4">
+          <CardContent className="space-y-3">
             {Object.entries(messTimings).map(([meal, time]) => {
               const colors = {
-                breakfast: 'from-yellow-100 to-orange-100 border-yellow-200 text-yellow-700 bg-yellow-50',
-                lunch: 'from-blue-100 to-cyan-100 border-blue-200 text-blue-700 bg-blue-50',
-                dinner: 'from-purple-100 to-pink-100 border-purple-200 text-purple-700 bg-purple-50'
+                breakfast: 'bg-orange-50 border-orange-100 text-orange-700',
+                lunch: 'bg-blue-50 border-blue-100 text-blue-700',
+                dinner: 'bg-purple-50 border-purple-100 text-purple-700'
               };
               return (
-                <div key={meal} className={`flex items-center justify-between p-4 rounded-xl border shadow-sm bg-gradient-to-r ${colors[meal as keyof typeof colors]} transition-all hover:shadow-lg`}>
-                  <div className="flex items-center space-x-3">
-                    <div className={`w-10 h-10 rounded-xl flex items-center justify-center bg-${meal}-500`}>
-                      <Clock className="w-5 h-5 text-white" />
-                    </div>
-                    <span className="font-medium capitalize">{meal}</span>
-                  </div>
-                  <span className="font-semibold">{time}</span>
+                <div key={meal} className={`flex items-center justify-between p-3 rounded-lg border ${colors[meal as keyof typeof colors]}`}>
+                  <span className="font-medium capitalize text-gray-700">{meal}</span>
+                  <span className="font-semibold text-gray-900">{time}</span>
                 </div>
               );
             })}
@@ -60,33 +57,35 @@ export function StudentMess() {
         </Card>
 
         {/* Meal Options */}
-        <Card className="bg-gradient-to-br from-white to-green-50 border-green-200 shadow-xl">
-          <CardHeader>
-            <CardTitle className="flex items-center space-x-2">
-              <Utensils className="w-5 h-5 text-green-600" />
-              <span>Meal Options</span>
+        <Card className="bg-white border border-gray-200 shadow-sm">
+          <CardHeader className="border-b border-gray-100 bg-gradient-to-r from-green-50 to-emerald-50">
+            <CardTitle className="flex items-center space-x-2 text-gray-800">
+              <div className="w-8 h-8 rounded-lg bg-green-500 flex items-center justify-center">
+                <Utensils className="w-4 h-4 text-white" />
+              </div>
+              <span className="text-lg font-semibold">Meal Options</span>
             </CardTitle>
           </CardHeader>
-          <CardContent className="space-y-4">
+          <CardContent className="space-y-3">
 
             {/* Vegetarian & Non-Vegetarian Menus */}
             {[
               { type: 'Vegetarian Menu', desc: 'Traditional vegetarian meals with variety of regional cuisines', color: 'green' },
               { type: 'Non-Vegetarian Menu', desc: 'Includes chicken, fish and egg preparations along with veg options', color: 'red' }
             ].map((menu, idx) => (
-              <div key={idx} className={`p-4 border-2 rounded-xl bg-gradient-to-r from-${menu.color}-50 to-${menu.color}-100 border-${menu.color}-200`}>
-                <div className="flex items-center justify-between mb-3">
-                  <h4 className={`font-semibold text-${menu.color}-800`}>{menu.type}</h4>
-                  <Badge className={`bg-${menu.color}-500 text-white shadow-md`}>Available</Badge>
+              <div key={idx} className={`p-3 border rounded-lg ${menu.color === 'green' ? 'bg-green-50 border-green-100' : 'bg-red-50 border-red-100'}`}>
+                <div className="flex items-center justify-between mb-2">
+                  <h4 className={`font-medium ${menu.color === 'green' ? 'text-green-800' : 'text-red-800'}`}>{menu.type}</h4>
+                  <Badge className={`${menu.color === 'green' ? 'bg-green-500' : 'bg-red-500'} text-white text-xs`}>Available</Badge>
                 </div>
                 <p className="text-sm text-gray-600">{menu.desc}</p>
               </div>
             ))}
 
             {/* Current Subscription */}
-            <div className="mt-4 p-4 bg-gradient-to-r from-blue-100 to-indigo-100 rounded-xl border border-blue-200 shadow-sm">
-              <h4 className="font-semibold text-blue-800 mb-2">Current Subscription</h4>
-              <p className="font-medium">Mixed Plan - ₹5,000/month</p>
+            <div className="mt-2 p-3 bg-blue-50 rounded-lg border border-blue-100">
+              <h4 className="font-medium text-blue-800 mb-1">Current Subscription</h4>
+              <p className="font-medium text-gray-900">Mixed Plan - ₹5,000/month</p>
               <p className="text-xs text-gray-600 mt-1">Includes all meal options</p>
             </div>
           </CardContent>
@@ -94,26 +93,28 @@ export function StudentMess() {
       </div>
 
       {/* Mess Cut Section */}
-      <Card className="bg-gradient-to-br from-white to-orange-50 border-orange-200 shadow-xl">
-        <CardHeader>
+      <Card className="bg-white border border-gray-200 shadow-sm">
+        <CardHeader className="border-b border-gray-100 bg-gradient-to-r from-orange-50 to-yellow-50">
           <CardTitle className="flex items-center justify-between">
-            <div className="flex items-center space-x-2">
-              <Scissors className="w-5 h-5 text-orange-600" />
-              <span>Mess Cut Requests</span>
+            <div className="flex items-center space-x-2 text-gray-800">
+              <div className="w-8 h-8 rounded-lg bg-orange-500 flex items-center justify-center">
+                <Scissors className="w-4 h-4 text-white" />
+              </div>
+              <span className="text-lg font-semibold">Mess Cut Requests</span>
             </div>
 
             {/* Request Button */}
             <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
               <DialogTrigger asChild>
-                <Button className="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white rounded-xl shadow-lg transition-all duration-300">
+                <Button className="bg-blue-500 hover:bg-blue-600 text-white rounded-lg shadow-sm transition-colors">
                   <Plus className="w-4 h-4 mr-2" /> Request Mess Cut
                 </Button>
               </DialogTrigger>
 
               {/* Dialog Content */}
-              <DialogContent className="bg-white/95 backdrop-blur-lg border-orange-100 rounded-2xl shadow-2xl">
+              <DialogContent className="bg-white border border-gray-200 rounded-lg shadow-lg">
                 <DialogHeader>
-                  <DialogTitle className="flex items-center space-x-2 text-orange-800">
+                  <DialogTitle className="flex items-center space-x-2 text-gray-800">
                     <CalendarX className="w-5 h-5" />
                     <span>Request Mess Cut</span>
                   </DialogTitle>
@@ -125,42 +126,42 @@ export function StudentMess() {
                 <form className="space-y-4 mt-4">
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2">
-                      <Label htmlFor="startDate">Start Date</Label>
+                      <Label htmlFor="startDate" className="text-gray-700">Start Date</Label>
                       <Input
                         id="startDate"
                         type="date"
                         value={messCut.startDate}
                         onChange={(e) => setMessCut({ ...messCut, startDate: e.target.value })}
-                        className="rounded-xl border-orange-200"
+                        className="rounded-lg border-gray-300"
                       />
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="endDate">End Date</Label>
+                      <Label htmlFor="endDate" className="text-gray-700">End Date</Label>
                       <Input
                         id="endDate"
                         type="date"
                         value={messCut.endDate}
                         onChange={(e) => setMessCut({ ...messCut, endDate: e.target.value })}
-                        className="rounded-xl border-orange-200"
+                        className="rounded-lg border-gray-300"
                       />
                     </div>
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="reason">Reason</Label>
+                    <Label htmlFor="reason" className="text-gray-700">Reason</Label>
                     <Textarea
                       id="reason"
                       placeholder="Reason for mess cut"
                       value={messCut.reason}
                       onChange={(e) => setMessCut({ ...messCut, reason: e.target.value })}
                       rows={3}
-                      className="rounded-xl border-orange-200"
+                      className="rounded-lg border-gray-300"
                     />
                   </div>
 
                   <Button
                     type="submit"
-                    className="w-full bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 rounded-xl shadow-lg transition-all duration-300"
+                    className="w-full bg-blue-500 hover:bg-blue-600 rounded-lg shadow-sm transition-colors"
                     disabled={!messCut.startDate || !messCut.endDate || calculateDaysBetween(messCut.startDate, messCut.endDate) < 3}
                   >
                     <CalendarX className="w-4 h-4 mr-2" />
@@ -178,10 +179,10 @@ export function StudentMess() {
             { title: 'Vacation Leave', status: 'Approved', color: 'yellow', start: 'Dec 20, 2024', end: 'Jan 5, 2025', savings: 3200 },
             { title: 'Family Visit', status: 'Completed', color: 'green', start: 'Nov 15, 2024', end: 'Nov 18, 2024', savings: 800 }
           ].map((entry, idx) => (
-            <div key={idx} className={`p-4 border-2 rounded-xl bg-gradient-to-r from-${entry.color}-50 to-${entry.color}-100 border-${entry.color}-200`}>
+            <div key={idx} className={`p-3 border rounded-lg ${entry.color === 'yellow' ? 'bg-yellow-50 border-yellow-100' : 'bg-green-50 border-green-100'}`}>
               <div className="flex items-center justify-between mb-2">
-                <h4 className={`font-medium text-${entry.color}-800`}>{entry.title}</h4>
-                <Badge className={`bg-${entry.color}-500 text-white shadow-md`}>{entry.status}</Badge>
+                <h4 className={`font-medium ${entry.color === 'yellow' ? 'text-yellow-800' : 'text-green-800'}`}>{entry.title}</h4>
+                <Badge className={`${entry.color === 'yellow' ? 'bg-yellow-500' : 'bg-green-500'} text-white text-xs`}>{entry.status}</Badge>
               </div>
               <p className="text-sm text-gray-600">{entry.start} - {entry.end} ({calculateDaysBetween(entry.start, entry.end)} days)</p>
               <p className="text-xs text-gray-500 mt-1">Savings: ₹{entry.savings}</p>
