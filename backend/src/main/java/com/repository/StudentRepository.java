@@ -33,8 +33,8 @@ public interface StudentRepository extends JpaRepository<Student, Integer> {
     Optional<Student> findByEmail(String email);
     
     @Query(value = "SELECT * FROM Student WHERE student_id = ?1", nativeQuery = true)
-    Optional<Student> findById(Integer studentId);
-    
+    Optional<Student> findStudentById(Integer studentId);
+        
     @Query(value = "SELECT * FROM Student", nativeQuery = true)
     List<Student> findAllStudents();
     

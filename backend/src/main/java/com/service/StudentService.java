@@ -102,8 +102,8 @@ public List<String> findRoommatesByStudentId(Integer studentId) {
         return studentRepository.findByEmail(email).orElse(null);
     }
 
-    public Student findById(Integer studentId) {
-        return studentRepository.findById(studentId).orElse(null);
+    public Student findStudentById(Integer studentId) {
+        return studentRepository.findStudentById(studentId).orElse(null);
     }
 
     public int changePassword(Integer studentId, String newPassword) {
