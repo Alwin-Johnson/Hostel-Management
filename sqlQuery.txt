@@ -1,0 +1,152 @@
+CREATE DATABASE hostel;
+USE hostel;
+
+CREATE TABLE Rooms (
+    room_id INT AUTO_INCREMENT PRIMARY KEY,
+    room_no VARCHAR(20) NOT NULL,
+    room_type VARCHAR(20) NOT NULL,
+    floor INT,
+    current_occupants INT DEFAULT 0,
+    monthly_rent DECIMAL(10,2) NOT NULL,
+    status VARCHAR(20) DEFAULT 'available'
+);
+
+CREATE TABLE MessMenu (
+    menu_id INT AUTO_INCREMENT PRIMARY KEY,
+    date DATE NOT NULL,
+    meal_type VARCHAR(20) NOT NULL,
+    price INT,
+    items VARCHAR(200)
+);
+
+CREATE TABLE Student (
+    student_id INT AUTO_INCREMENT PRIMARY KEY,
+    college_id VARCHAR(20) UNIQUE,
+    name VARCHAR(100) NOT NULL,
+    gender ENUM('Male','Female','Other') NOT NULL,
+    dob DATE,
+    admission_date DATE NOT NULL,
+    course ENUM('BTech','MTech') NOT NULL,
+    stream ENUM('CSE','ECE','Civil','Mechanical','Electrical') NOT NULL,
+    year ENUM('First','Second','Third','Fourth') NOT NULL,
+    email VARCHAR(100) UNIQUE,
+    contact_no VARCHAR(15) NOT NULL,
+    address VARCHAR(100),
+    guardian_name VARCHAR(100) NOT NULL,
+    guardian_contact VARCHAR(15) NOT NULL,
+    parent_name VARCHAR(100),
+    parent_contact VARCHAR(15),
+    room_id INT DEFAULT NULL,
+    admission_fee BOOLEAN DEFAULT FALSE,
+    password VARCHAR(255) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_room FOREIGN KEY (room_id) REFERENCES Rooms(room_id)
+        ON DELETE SET NULL
+);
+
+CREATE TABLE Fees (
+    fee_id INT AUTO_INCREMENT PRIMARY KEY,
+    student_id INT,
+    amount DECIMAL(10,2) NOT NULL,
+    due_date DATE NOT NULL,
+    paid_date DATE,
+    status VARCHAR(20) DEFAULT 'pending',
+    payment_mode VARCHAR(20),
+    CONSTRAINT fk_student FOREIGN KEY (student_id) REFERENCES Student(student_id)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE
+);
+
+CREATE TABLE MessSkipping (
+    skip_id INT AUTO_INCREMENT PRIMARY KEY,
+    student_id INT,
+    date DATE NOT NULL,
+    meal_type VARCHAR(20) NOT NULL,
+    skipped BOOLEAN DEFAULT TRUE,
+    CONSTRAINT fk_student_skip FOREIGN KEY (student_id) REFERENCES Student(student_id)
+        ON DELETE CASCADE
+);
+
+
+ALTER TABLE Student AUTO_INCREMENT = 1;
+INSERT INTO Rooms (room_no, room_type, floor, current_occupants, monthly_rent, status)
+VALUES
+('A101', 'Single', 1, 1, 6000.00, 'occupied'),
+('A102', 'Double', 1, 2, 5000.00, 'occupied'),
+('B201', 'Triple', 2, 3, 4000.00, 'occupied'),
+('B202', 'Single', 2, 0, 6000.00, 'available'),
+('C301', 'Double', 3, 2, 5000.00, 'occupied');
+INSERT INTO Student (college_id, name, gender, dob, admission_date, course, stream, year, email, contact_no, address, guardian_name, guardian_contact, parent_name, parent_contact, room_id, admission_fee, password)
+VALUES
+('CSE001', 'Aisha Khan', 'Female', '2003-05-12', '2022-08-10', 'BTech', 'CSE', 'Third', 'aisha.khan@college.edu', '9876543210', 'Chennai', 'Rehan Khan', '9876501234', 'Rehan Khan', '9876501234', 1, TRUE, 'aisha@123'),
+('ECE002', 'Rahul Verma', 'Male', '2002-11-20', '2021-07-15', 'BTech', 'ECE', 'Fourth', 'rahul.verma@college.edu', '9123456780', 'Mumbai', 'Suresh Verma', '9123409876', 'Suresh Verma', '9123409876', 2, TRUE, 'rahul@123'),
+('CIV003', 'Sneha Reddy', 'Female', '2004-02-10', '2023-09-01', 'BTech', 'Civil', 'Second', 'sneha.reddy@college.edu', '9001234567', 'Hyderabad', 'Ravi Reddy', '9009876543', 'Ravi Reddy', '9009876543', 3, TRUE, 'sneha@123'),
+('MEC004', 'Arjun Nair', 'Male', '2003-03-05', '2022-07-22', 'BTech', 'Mechanical', 'Third', 'arjun.nair@college.edu', '9887654321', 'Kochi', 'Suresh Nair', '9887098765', 'Suresh Nair', '9887098765', 5, TRUE, 'arjun@123'),
+('ELE005', 'Priya Sharma', 'Female', '2001-09-15', '2020-08-12', 'MTech', 'Electrical', 'Fourth', 'priya.sharma@college.edu', '9998765432', 'Delhi', 'Vikas Sharma', '9997654321', 'Vikas Sharma', '9997654321', 4, TRUE, 'priya@123'),
+('CSE006', 'Rohan Das', 'Male', '2004-07-18', '2023-08-10', 'BTech', 'CSE', 'Second', 'rohan.das@college.edu', '9812345678', 'Kolkata', 'Anil Das', '9812309876', 'Anil Das', '9812309876', 2, TRUE, 'rohan@123'),
+('ECE007', 'Neha Patel', 'Female', '2003-09-25', '2022-09-01', 'BTech', 'ECE', 'Third', 'neha.patel@college.edu', '9898765432', 'Ahmedabad', 'Mahesh Patel', '9898701234', 'Mahesh Patel', '9898701234', 3, FALSE, 'neha@123'),
+('MEC008', 'Vikram Rao', 'Male', '2002-12-30', '2021-07-20', 'BTech', 'Mechanical', 'Fourth', 'vikram.rao@college.edu', '9901234567', 'Bangalore', 'Ramesh Rao', '9909876543', 'Ramesh Rao', '9909876543', 3, TRUE, 'vikram@123'),
+('CIV009', 'Ananya Pillai', 'Female', '2004-03-12', '2023-07-25', 'BTech', 'Civil', 'Second', 'ananya.pillai@college.edu', '9823456789', 'Trivandrum', 'Sanjay Pillai', '9823409876', 'Sanjay Pillai', '9823409876', 5, TRUE, 'ananya@123'),
+('ELE010', 'Karan Mehta', 'Male', '2001-10-10', '2020-07-10', 'MTech', 'Electrical', 'Fourth', 'karan.mehta@college.edu', '9912345678', 'Pune', 'Rohit Mehta', '9912309876', 'Rohit Mehta', '9912309876', 4, TRUE, 'karan@123');
+INSERT INTO Fees (student_id, amount, due_date, paid_date, status, payment_mode)
+VALUES
+(1, 6000.00, '2025-10-10', '2025-10-09', 'paid', 'Online'),
+(2, 5000.00, '2025-10-12', NULL, 'pending', NULL),
+(3, 4000.00, '2025-10-15', '2025-10-14', 'paid', 'Cash'),
+(4, 5000.00, '2025-10-18', NULL, 'pending', NULL),
+(5, 6000.00, '2025-10-20', NULL, 'pending', NULL),
+(6, 5000.00, '2025-10-22', '2025-10-21', 'paid', 'UPI'),
+(7, 4000.00, '2025-10-22', NULL, 'pending', NULL),
+(8, 5000.00, '2025-10-23', NULL, 'pending', NULL),
+(9, 4000.00, '2025-10-25', '2025-10-24', 'paid', 'Card'),
+(10, 6000.00, '2025-10-28', NULL, 'pending', NULL);
+INSERT INTO MessSkipping (student_id, date, meal_type, skipped)
+VALUES
+(1, '2025-10-15', 'Lunch', TRUE),
+(1, '2025-10-16', 'Breakfast', TRUE),
+(2, '2025-10-15', 'Dinner', FALSE),
+(3, '2025-10-16', 'Lunch', TRUE),
+(4, '2025-10-15', 'Breakfast', TRUE),
+(5, '2025-10-16', 'Dinner', TRUE),
+(6, '2025-10-15', 'Lunch', FALSE),
+(7, '2025-10-16', 'Breakfast', TRUE),
+(8, '2025-10-16', 'Lunch', TRUE),
+(9, '2025-10-15', 'Dinner', FALSE);
+INSERT INTO MessMenu (date, meal_type, price, items)
+VALUES
+('2025-10-15', 'Breakfast', 50, 'Idli, Sambar, Tea'),
+('2025-10-15', 'Lunch', 80, 'Rice, Dal, Chicken Curry'),
+('2025-10-15', 'Dinner', 70, 'Chapati, Paneer Butter Masala'),
+('2025-10-16', 'Breakfast', 45, 'Poha, Coffee'),
+('2025-10-16', 'Lunch', 85, 'Fried Rice, Gobi Manchurian'),
+('2025-10-16', 'Dinner', 75, 'Rice, Fish Curry');
+
+select * from student;
+INSERT INTO messskipping (student_id, date, meal_type, skipped) 
+VALUES (1, CURDATE(), 'Breakfast', TRUE);
+
+-- Student 2 skipped Lunch today
+INSERT INTO messskipping (student_id, date, meal_type, skipped) 
+VALUES (2, CURDATE(), 'Lunch', TRUE);
+
+-- Student 3 skipped Dinner today
+INSERT INTO messskipping (student_id, date, meal_type, skipped) 
+VALUES (3, CURDATE(), 'Dinner', TRUE);
+
+-- Student 4 skipped both Breakfast and Lunch today
+INSERT INTO messskipping (student_id, date, meal_type, skipped) 
+VALUES (4, CURDATE(), 'Breakfast', TRUE);
+
+INSERT INTO messskipping (student_id, date, meal_type, skipped) 
+VALUES (4, CURDATE(), 'Lunch', TRUE);
+
+-- Student 5 skipped all three meals today
+INSERT INTO messskipping (student_id, date, meal_type, skipped) 
+VALUES (5, CURDATE(), 'Breakfast', TRUE);
+
+INSERT INTO messskipping (student_id, date, meal_type, skipped) 
+VALUES (5, CURDATE(), 'Lunch', TRUE);
+
+INSERT INTO messskipping (student_id, date, meal_type, skipped) 
+VALUES (5, CURDATE(), 'Dinner', TRUE);
+SELECT * FROM messskipping WHERE date = CURDATE() AND skipped = 1;
